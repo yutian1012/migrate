@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables>
+<table from="fee" to="fee" type="MIGRATE">
+	<fields>
+		<field from="caseNo" to="">
+			<format>
+				<format_class_name>org.ipph.format.JsonMethodFormat</format_class_name>
+				<format_class_arg>{'SQF':'申请费','SSF':'实审费','FSF':'复审费','ZLSQF':'授权费','DLF':'代理费','QTF':'其他费'}</format_class_arg>
+			</format>
+		</field>
+	</fields>
+</table>
+</tables>
+

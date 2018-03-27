@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://www.migrate.org/schema/tables"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+   xsi:schemaLocation="http://www.migrate.org/schema/tables tables.xsd">
+    <table type="MIGRATE" to="sys_user" from="twxuser">
+    	<fields>
+			<field to="userid" from="id"></field>    	
+    		<field to="account" from="loginname"></field>
+    		<field to="fullname" from="name"></field>
+    		<field to="usertype" from="userType">
+    			<format>
+    				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
+    				<format_class_arg>{'GR':'2','QY':'1','GX':'3'}</format_class_arg>
+    			</format>
+    		</field>
+    	</fields>
+    </table>
+</tables>

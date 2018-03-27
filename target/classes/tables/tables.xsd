@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="tables">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="table" minOccurs="1"></xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="table">
+		<xsd:complexType>
+			<!-- template 内部元素 -->
+			<xsd:sequence>
+				<xsd:element name="fields" minOccurs="1">
+					<xsd:complexType>
+						<xsd:sequence>
+							<!-- field标签可以出现多次，至少出现1次 -->
+							<xsd:element ref="field" minOccurs="1"></xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<!-- template 元素的属性 -->
+			<xsd:attribute name="from" use="required"></xsd:attribute>
+			<xsd:attribute name="to" use="required"></xsd:attribute>
+			<xsd:attribute name="type" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+					    <xsd:enumeration value="UPDATE"/>
+					    <xsd:enumeration value="MIGRATE"/>
+					  </xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="field">
+		<xsd:complexType>
+			<!-- field标签中包含的元素 -->
+			<xsd:sequence>
+				<xsd:element name="type" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+				<!-- format方法设置 -->
+				<xsd:element ref="format" minOccurs="0"></xsd:element>
+			</xsd:sequence>
+			<!-- field标签的属性 -->
+			<xsd:attribute name="from" use="required"></xsd:attribute>
+			<xsd:attribute name="to" use="required"></xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="format">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="format_class_name" type="xsd:string" minOccurs="1"></xsd:element>
+				<xsd:element name="format_class_arg" type="xsd:string" minOccurs="1"></xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
