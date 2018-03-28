@@ -22,16 +22,16 @@
 				</xsd:element>
 			</xsd:sequence>
 			<!-- template 元素的属性 -->
-			<xsd:attribute name="from" use="required"></xsd:attribute>
-			<xsd:attribute name="to" use="required"></xsd:attribute>
 			<xsd:attribute name="type" use="required">
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
-					    <xsd:enumeration value="UPDATE"/>
 					    <xsd:enumeration value="MIGRATE"/>
+					    <xsd:enumeration value="UPDATE"/>
 					  </xsd:restriction>
 				</xsd:simpleType>
 			</xsd:attribute>
+			<xsd:attribute name="to" use="required"></xsd:attribute>
+			<xsd:attribute name="from" use="required"></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -41,11 +41,23 @@
 			<xsd:sequence>
 				<xsd:element name="type" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
 				<!-- format方法设置 -->
-				<xsd:element ref="format" minOccurs="0"></xsd:element>
+				<xsd:element ref="format" minOccurs="0" maxOccurs="1"></xsd:element>
+				<!-- 筛选条件 -->
+				<xsd:element ref="condition" maxOccurs="1"></xsd:element>
 			</xsd:sequence>
 			<!-- field标签的属性 -->
-			<xsd:attribute name="from" use="required"></xsd:attribute>
+			<xsd:attribute name="field_restrict">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="UNIQUE"></xsd:enumeration>
+						<xsd:enumeration value="FOREIGN"></xsd:enumeration>
+						<xsd:enumeration value="PRIMARY"></xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="field_default"></xsd:attribute>
 			<xsd:attribute name="to" use="required"></xsd:attribute>
+			<xsd:attribute name="from" use="required"></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	
@@ -55,6 +67,23 @@
 				<xsd:element name="format_class_name" type="xsd:string" minOccurs="1"></xsd:element>
 				<xsd:element name="format_class_arg" type="xsd:string" minOccurs="1"></xsd:element>
 			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="condition">
+		<xsd:complexType>
+			<xsd:attribute name="type">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="LIKE"></xsd:enumeration>
+						<xsd:enumeration value="LLIKE"></xsd:enumeration>
+						<xsd:enumeration value="RLIKE"></xsd:enumeration>
+						<xsd:enumeration value="IN"></xsd:enumeration>
+						<xsd:enumeration value="EQUAL"></xsd:enumeration>
+						<xsd:enumeration value="NEQUAL"></xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 </xsd:schema>

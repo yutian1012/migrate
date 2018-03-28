@@ -3,8 +3,10 @@ package org.ipph.xml;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ipph.model.FieldConditionModel;
 import org.ipph.model.FieldFormatModel;
 import org.ipph.model.FieldModel;
+import org.ipph.model.FieldRestrictEnum;
 import org.ipph.model.TableModel;
 import org.ipph.model.TableOperationEnum;
 import org.xml.sax.SAXException;
@@ -34,6 +36,7 @@ public class TransferTableHandler extends DefaultHandler {
     private TableModel table=null;
     private FieldModel fieldModel=null;
     private FieldFormatModel fieldFormatModel=null;
+    private FieldConditionModel fieldConditionModel=null;
 
     private StringBuffer temp=new StringBuffer();
     
@@ -65,9 +68,16 @@ public class TransferTableHandler extends DefaultHandler {
         }else if(XmlElement.field.equals(qName)){
         	fieldModel=new FieldModel();
         	fieldModel.setFrom(attributes.getValue("from"));
-        	fieldModel.setFrom(null==attributes.getValue("to")?attributes.getValue("from"):attributes.getValue("to"));
+        	//fieldModel.setTo(null==attributes.getValue("to")?attributes.getValue("from"):attributes.getValue("to"));
+        	fieldModel.setTo(attributes.getValue("to"));
+        	fieldModel.setDefaultValue(null!=attributes.getValue("field_default")?attributes.getValue("field_default"):"");
+        	if(null!=attributes.getValue("field_restrict")&&!"".equals(attributes.getValue("field_restrict"))){
+        		fieldModel.setRestrict(FieldRestrictEnum.valueOf(attributes.getValue("field_restrict")));
+        	}
         }else if(XmlElement.format.equals(qName)){
         	fieldFormatModel=new FieldFormatModel();
+        }else if(XmlElement.field_condition.equals(qName)){
+        	fieldConditionModel=new FieldConditionModel();
         }
     };
     /**
@@ -102,8 +112,13 @@ public class TransferTableHandler extends DefaultHandler {
     			fieldModel.setFormat(fieldFormatModel.copyFieldFormatModel());//克隆对象
     		}
     		fieldFormatModel=null;
-    	}
-    	else if(XmlElement.field.equals(qName)){
+    	}else if(XmlElement.field_condition.equals(qName)){
+    		if(null!=fieldModel&&fieldConditionModel!=null){
+    			fieldConditionModel.setValue(s);
+    			fieldModel.setCondition(fieldConditionModel.copyFieldConditionModel());//克隆对象
+    		}
+    		fieldFormatModel=null;
+    	}else if(XmlElement.field.equals(qName)){
     		if(null!=fieldModel&&null!=table){
     			table.getFiledList().add(fieldModel.copyFieldModel());
     		}

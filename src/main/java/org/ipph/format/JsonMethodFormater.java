@@ -12,6 +12,8 @@ public class JsonMethodFormater implements Formater{
 	
 	@SuppressWarnings("unchecked")
 	public Object format(String args,Object value){
+		if(null==value) return null;
+		
 		String val= value.toString();
 		if(null!=args&&!"".equals(args)){
 			Map<String,Object> jsonMap = JSON.parseObject(args, Map.class);

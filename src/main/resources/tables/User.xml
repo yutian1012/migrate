@@ -5,13 +5,29 @@
     	<fields>
 			<field to="userid" from="id"></field>    	
     		<field to="account" from="loginname"></field>
-    		<field to="fullname" from="name"></field>
-    		<field to="usertype" from="userType">
+    		<field to="fullname" from="name" field_restrict="UNIQUE"></field>
+    		<field to="password" from="" field_default="a4ayc/80/OGda4BO/1o/V0etpOqiLx1JwB5S3beHW0s="></field>
+    		<!-- 针对无法格式化的数据提供默认值 -->
+    		<field to="usertype" from="userType" field_default="1">
     			<format>
     				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
     				<format_class_arg>{'GR':'2','QY':'1','GX':'3'}</format_class_arg>
     			</format>
+    			<condition type="NEQUAL">null</condition>
     		</field>
+    		<field to="cardid" from="idcard"></field>
+    		<field to="address" from="address"></field>
+    		<field to="mobile" from="mobile"></field>
+    		<field to="phone" from="tel"></field>
+    		<field to="email" from="email"></field>
+    		<field to="bankaccount" from="account"></field>
+    		<field to="bank" from="bank"></field>
+    		<field to="isexpired" from="" field_default="0"></field>
+    		<field to="islock" from="" field_default="0"></field>
+    		<field to="status" from="" field_default="2"></field>
+    		<field to="fromtype" from="" field_default="0"></field>
+    		<field to="isimport" from="" field_default="0"></field>
+    		<field to="istalent" from="" field_default="0"></field>
     	</fields>
     </table>
 </tables>

@@ -3,13 +3,18 @@ package org.ipph.format;
 import java.util.List;
 
 import org.ipph.model.FieldFormatModel;
-import org.springframework.stereotype.Component;
 
-@Component
+
 public class FormaterContext {
 	
 	private List<Formater> formaterList;
 	
+	public List<Formater> getFormaterList() {
+		return formaterList;
+	}
+	public void setFormaterList(List<Formater> formaterList) {
+		this.formaterList = formaterList;
+	}
 	/**
 	 * 格式化数据
 	 * @param fieldFormatModel
@@ -23,7 +28,7 @@ public class FormaterContext {
 		
 		Formater formater=getFormater(fieldFormatModel.getClassName());
 		if(null!=formater){
-			formater.format(fieldFormatModel.getMethodArgs(), value);
+			value=formater.format(fieldFormatModel.getMethodArgs(), value);
 		}
 		
 		return value;
@@ -39,7 +44,7 @@ public class FormaterContext {
 		if(null==formater||"".equals(formater)) return null;
 		
 		for(Formater f:formaterList){
-			if(f.getClass().toString().equals(formater)){
+			if(f.getClass().getName().equals(formater)){
 				return f;
 			}
 		}

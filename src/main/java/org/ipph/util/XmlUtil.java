@@ -29,7 +29,7 @@ public class XmlUtil {
 	 */
 	public static List<TableModel> parseBySax(String path) throws ParserConfigurationException, SAXException, IOException{
 		
-		if(! validateXmlByXSD(path)) return null;
+		//if(! validateXmlByXSD(path)) return null;
 		
 		// 创建解析工厂  
         SAXParserFactory factory = SAXParserFactory.newInstance();  

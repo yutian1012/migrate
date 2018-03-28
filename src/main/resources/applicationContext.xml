@@ -31,5 +31,15 @@
     	<property name="password" value="root"></property>
     </bean>
     
+    <!-- 格式化上下文处理类 -->
+    <bean id="formaterContext" class="org.ipph.format.FormaterContext">
+    	<property name="formaterList">
+    		<list>
+    			<ref bean="jsonMethodFormater"/>
+    		</list>
+    	</property>
+    </bean>
     
+    <!-- 格式化实现类 -->
+    <bean id="jsonMethodFormater" class="org.ipph.format.JsonMethodFormater"></bean>
 </beans>
