@@ -36,10 +36,25 @@
     	<property name="formaterList">
     		<list>
     			<ref bean="jsonMethodFormater"/>
+    			<ref bean="patentNoFormater"/>
     		</list>
     	</property>
     </bean>
     
     <!-- 格式化实现类 -->
     <bean id="jsonMethodFormater" class="org.ipph.format.JsonMethodFormater"></bean>
+    <bean id="patentNoFormater" class="org.ipph.format.PatentNoFormater"></bean>
+    
+    <!-- 条件处理 -->
+    <bean id="conditionContext" class="org.ipph.condition.ConditionContext">
+    	<property name="conditionList">
+    		<list>
+    			<ref bean="conditionInImpl"/>
+    			<ref bean="conditionDefaultImpl"/>
+    		</list>
+    	</property>
+    </bean>
+    
+    <bean id="conditionInImpl" class="org.ipph.condition.ConditionInImpl"></bean>
+    <bean id="conditionDefaultImpl" class="org.ipph.condition.ConditionDefaultImpl"></bean>
 </beans>

@@ -5,7 +5,7 @@ package org.ipph.model;
 public class FieldModel implements Cloneable{
 	private String from;
 	private String to;
-	private String type;
+	private FieldDataTypeEnum fieldType;
 	private String defaultValue;
 	private FieldRestrictEnum restrict;//键值的约束问题
 	private FieldFormatModel format;
@@ -23,11 +23,11 @@ public class FieldModel implements Cloneable{
 	public void setTo(String to) {
 		this.to = to;
 	}
-	public String getType() {
-		return type;
+	public FieldDataTypeEnum getFieldType() {
+		return fieldType;
 	}
-	public void setType(String type) {
-		this.type = type;
+	public void setFieldType(FieldDataTypeEnum fieldType) {
+		this.fieldType = fieldType;
 	}
 	public FieldFormatModel getFormat() {
 		return format;

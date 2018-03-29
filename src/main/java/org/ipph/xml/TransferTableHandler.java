@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ipph.model.FieldConditionModel;
+import org.ipph.model.FieldConditionTypeEnum;
+import org.ipph.model.FieldDataTypeEnum;
 import org.ipph.model.FieldFormatModel;
 import org.ipph.model.FieldModel;
 import org.ipph.model.FieldRestrictEnum;
@@ -64,6 +66,9 @@ public class TransferTableHandler extends DefaultHandler {
         	table.setType(TableOperationEnum.valueOf(attributes.getValue("type")));
         	table.setFrom(attributes.getValue("from"));
         	table.setTo(attributes.getValue("to"));
+        	if(null!=attributes.getValue("skip")&&!"".equals(attributes.getValue("skip"))){
+        		table.setSkip(Boolean.parseBoolean(attributes.getValue("skip").trim()));
+        	}
         	table.setFiledList(new ArrayList<FieldModel>());
         }else if(XmlElement.field.equals(qName)){
         	fieldModel=new FieldModel();
@@ -78,6 +83,7 @@ public class TransferTableHandler extends DefaultHandler {
         	fieldFormatModel=new FieldFormatModel();
         }else if(XmlElement.field_condition.equals(qName)){
         	fieldConditionModel=new FieldConditionModel();
+        	fieldConditionModel.setConditionType(FieldConditionTypeEnum.valueOf(attributes.getValue("type")));
         }
     };
     /**
@@ -97,7 +103,9 @@ public class TransferTableHandler extends DefaultHandler {
     	//解析Field内的节点内容
     	if(XmlElement.type.equals(qName)){
     		if(null!=fieldModel){
-    			fieldModel.setType(s);
+    			if(null!=s&&!"".equals(s)){
+    				fieldModel.setFieldType(FieldDataTypeEnum.valueOf(s));
+    			}
     		}
     	}else if(XmlElement.format_class_name.equals(qName)) {
     		if(null!=fieldFormatModel){

@@ -2,6 +2,7 @@ package org.ipph.format;
 
 import java.util.List;
 
+import org.ipph.exception.FormatException;
 import org.ipph.model.FieldFormatModel;
 
 
@@ -20,8 +21,9 @@ public class FormaterContext {
 	 * @param fieldFormatModel
 	 * @param value
 	 * @return
+	 * @throws Exception 
 	 */
-	public Object getFormatedValue(FieldFormatModel fieldFormatModel,Object value ) {
+	public Object getFormatedValue(FieldFormatModel fieldFormatModel,Object value ) throws FormatException {
 		if(null==fieldFormatModel){
 			return value;
 		}

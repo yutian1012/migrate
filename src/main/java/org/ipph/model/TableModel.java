@@ -10,6 +10,7 @@ public class TableModel implements Cloneable{
 	private List<FieldModel> filedList;
 	private String from;
 	private String to;
+	private boolean skip;
 	public TableOperationEnum getType() {
 		return type;
 	}
@@ -33,6 +34,12 @@ public class TableModel implements Cloneable{
 	}
 	public void setTo(String to) {
 		this.to = to;
+	}
+	public boolean isSkip() {
+		return skip;
+	}
+	public void setSkip(boolean skip) {
+		this.skip = skip;
 	}
 	public TableModel copyTableModel(){
 		try {
