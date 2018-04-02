@@ -37,6 +37,7 @@
     		<list>
     			<ref bean="jsonMethodFormater"/>
     			<ref bean="patentNoFormater"/>
+    			<ref bean="pctNoFormater"/>
     		</list>
     	</property>
     </bean>
@@ -44,6 +45,7 @@
     <!-- 格式化实现类 -->
     <bean id="jsonMethodFormater" class="org.ipph.format.JsonMethodFormater"></bean>
     <bean id="patentNoFormater" class="org.ipph.format.PatentNoFormater"></bean>
+    <bean id="pctNoFormater" class="org.ipph.format.PctNoFormater"></bean>
     
     <!-- 条件处理 -->
     <bean id="conditionContext" class="org.ipph.condition.ConditionContext">

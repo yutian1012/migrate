@@ -23,6 +23,31 @@ public class PatentValidationUtil {
 		}
 		return false;
 	}
+	/**
+	 * 是否是格式化规范的pct号码
+	 * @param pctNo
+	 * @return
+	 */
+	public static boolean isValidPctNo(String pctNo){
+		if(StringUtils.isEmpty(pctNo)){
+			return false;
+		}
+		Pattern pattern=Pattern.compile("^PCT[/]CN(?:19|20\\d{2})[/]\\d{6}$");
+		return pattern.matcher(pctNo).matches();
+	}
+	
+	/**
+	 * 校验授权号
+	 * @param authNo
+	 * @return
+	 */
+	public static boolean isValidpctAuthNo(String pctAuthNo){
+		if(StringUtils.isEmpty(pctAuthNo)){
+			return false;
+		}
+		Pattern pattern=Pattern.compile("^((CN\\d{9})|(US\\d{7})|(KR\\d{9})|(JP\\d{7})|(EP\\d{7})|(RU\\d{10}))$");
+		return pattern.matcher(pctAuthNo).matches();
+	}
 	
 	private static String[] getZlNumber(String appNumber){
 		String[] zlNumber=new String[2];//第1个位置存放专利号，第二个wiz存放校验位
@@ -84,10 +109,5 @@ public class PatentValidationUtil {
 		else{
 			return (flag+"").equalsIgnoreCase(validation);
 		}
-	}
-	
-	public static void main(String[] args) {
-		String appNumber="CN201620150382";
-		System.out.println(PatentValidationUtil.isValidAppNumber(appNumber));
 	}
 }

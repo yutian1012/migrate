@@ -9,6 +9,8 @@ import org.ipph.model.FieldDataTypeEnum;
 import org.ipph.model.FieldFormatModel;
 import org.ipph.model.FieldModel;
 import org.ipph.model.FieldRestrictEnum;
+import org.ipph.model.FieldSeparatorModel;
+import org.ipph.model.SubtableModel;
 import org.ipph.model.TableModel;
 import org.ipph.model.TableOperationEnum;
 import org.xml.sax.SAXException;
@@ -39,6 +41,8 @@ public class TransferTableHandler extends DefaultHandler {
     private FieldModel fieldModel=null;
     private FieldFormatModel fieldFormatModel=null;
     private FieldConditionModel fieldConditionModel=null;
+    private SubtableModel subTableModel=null;
+    private FieldSeparatorModel fieldSeparatorModel=null;
 
     private StringBuffer temp=new StringBuffer();
     
@@ -61,7 +65,7 @@ public class TransferTableHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, org.xml.sax.Attributes attributes) throws SAXException {
     	//开始解析节点，设置当前解析节点的标签名称
-    	if(XmlElement.table.equals(qName)) {
+    	if(XmlElement.table.equals(qName)) {//表
     		table=new TableModel();
         	table.setType(TableOperationEnum.valueOf(attributes.getValue("type")));
         	table.setFrom(attributes.getValue("from"));
@@ -70,7 +74,18 @@ public class TransferTableHandler extends DefaultHandler {
         		table.setSkip(Boolean.parseBoolean(attributes.getValue("skip").trim()));
         	}
         	table.setFiledList(new ArrayList<FieldModel>());
-        }else if(XmlElement.field.equals(qName)){
+        	table.setSubTableList(new ArrayList<SubtableModel>());
+        }else if(XmlElement.subTable.equals(qName)){//子表
+        	subTableModel=new SubtableModel();
+        	if(null!=table){
+        		subTableModel.setFrom(table.getFrom());
+        	}
+        	subTableModel.setTo(attributes.getValue("name"));
+        	if(null!=attributes.getValue("skip")&&!"".equals(attributes.getValue("skip"))){
+        		subTableModel.setSkip(Boolean.parseBoolean(attributes.getValue("skip").trim()));
+        	}
+        	subTableModel.setFiledList(new ArrayList<FieldModel>());
+        }else if(XmlElement.field.equals(qName)){//字段
         	fieldModel=new FieldModel();
         	fieldModel.setFrom(attributes.getValue("from"));
         	//fieldModel.setTo(null==attributes.getValue("to")?attributes.getValue("from"):attributes.getValue("to"));
@@ -79,9 +94,11 @@ public class TransferTableHandler extends DefaultHandler {
         	if(null!=attributes.getValue("field_restrict")&&!"".equals(attributes.getValue("field_restrict"))){
         		fieldModel.setRestrict(FieldRestrictEnum.valueOf(attributes.getValue("field_restrict")));
         	}
-        }else if(XmlElement.format.equals(qName)){
+        }else if(XmlElement.format.equals(qName)){//格式化
         	fieldFormatModel=new FieldFormatModel();
-        }else if(XmlElement.field_condition.equals(qName)){
+        }else if(XmlElement.fieldSeparator.equals(qName)){//字段拆分
+        	fieldSeparatorModel=new FieldSeparatorModel();
+        }else if(XmlElement.field_condition.equals(qName)){//条件
         	fieldConditionModel=new FieldConditionModel();
         	fieldConditionModel.setConditionType(FieldConditionTypeEnum.valueOf(attributes.getValue("type")));
         }
@@ -120,6 +137,19 @@ public class TransferTableHandler extends DefaultHandler {
     			fieldModel.setFormat(fieldFormatModel.copyFieldFormatModel());//克隆对象
     		}
     		fieldFormatModel=null;
+    	}else if(XmlElement.separator_class_name.equals(qName)) {
+    		if(null!=fieldSeparatorModel){
+    			fieldSeparatorModel.setClassName(s);
+    		}
+    	}else if(XmlElement.separator_class_arg.equals(qName)) {  
+    		if(null!=fieldSeparatorModel){
+    			fieldSeparatorModel.setMethodArgs(s);
+    		}
+    	}else if(XmlElement.fieldSeparator.equals(qName)){
+    		if(null!=fieldModel&&fieldSeparatorModel!=null){
+    			fieldModel.setFieldSeparatorModel(fieldSeparatorModel.copyFieldSeparatorModel());//克隆对象
+    		}
+    		fieldSeparatorModel=null;
     	}else if(XmlElement.field_condition.equals(qName)){
     		if(null!=fieldModel&&fieldConditionModel!=null){
     			fieldConditionModel.setValue(s);
@@ -128,9 +158,18 @@ public class TransferTableHandler extends DefaultHandler {
     		fieldFormatModel=null;
     	}else if(XmlElement.field.equals(qName)){
     		if(null!=fieldModel&&null!=table){
-    			table.getFiledList().add(fieldModel.copyFieldModel());
+    			if(subTableModel!=null){
+    				subTableModel.getFiledList().add(fieldModel.copyFieldModel());
+    			}else{
+    				table.getFiledList().add(fieldModel.copyFieldModel());
+    			}
     		}
     		fieldModel=null;
+    	}else if(XmlElement.subTable.equals(qName)){
+    		if(null!=subTableModel&&null!=table){
+    			table.getSubTableList().add(subTableModel.copySubtableModel());
+    		}
+    		subTableModel=null;
     	}else if(XmlElement.table.equals(qName)){
     		if(null!=table){
     			tableList.add(table.copyTableModel());

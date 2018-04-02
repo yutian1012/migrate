@@ -8,6 +8,7 @@ import java.util.List;
 public class TableModel implements Cloneable{
 	private TableOperationEnum type;
 	private List<FieldModel> filedList;
+	private List<SubtableModel> subTableList;
 	private String from;
 	private String to;
 	private boolean skip;
@@ -40,6 +41,12 @@ public class TableModel implements Cloneable{
 	}
 	public void setSkip(boolean skip) {
 		this.skip = skip;
+	}
+	public List<SubtableModel> getSubTableList() {
+		return subTableList;
+	}
+	public void setSubTableList(List<SubtableModel> subTableList) {
+		this.subTableList = subTableList;
 	}
 	public TableModel copyTableModel(){
 		try {

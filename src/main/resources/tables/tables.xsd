@@ -10,7 +10,6 @@
 	
 	<xsd:element name="table">
 		<xsd:complexType>
-			<!-- template 内部元素 -->
 			<xsd:sequence>
 				<xsd:element name="fields" minOccurs="1">
 					<xsd:complexType>
@@ -20,8 +19,8 @@
 						</xsd:sequence>
 					</xsd:complexType>
 				</xsd:element>
+				<xsd:element ref="subTable"></xsd:element>
 			</xsd:sequence>
-			<!-- template 元素的属性 -->
 			<xsd:attribute name="skip">
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
@@ -43,6 +42,29 @@
 		</xsd:complexType>
 	</xsd:element>
 	
+	<xsd:element name="subTable">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="fields" minOccurs="1">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element ref="field" minOccurs="1"></xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="name" use="required"></xsd:attribute>
+			<xsd:attribute name="skip">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="true"/>
+						<xsd:enumeration value="false"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	
 	<xsd:element name="field">
 		<xsd:complexType>
 			<!-- field标签中包含的元素 -->
@@ -50,7 +72,11 @@
 				<xsd:element name="type" type="xsd:string" minOccurs="0" maxOccurs="1">
 					<xsd:simpleType>
 						<xsd:restriction base="xsd:string">
-							<xsd:enumeration value=""></xsd:enumeration>
+							<xsd:enumeration value="VARCHAR"></xsd:enumeration>
+							<xsd:enumeration value="DATE"></xsd:enumeration>
+							<xsd:enumeration value="NUMERIC"></xsd:enumeration>
+							<xsd:enumeration value="BLOB"></xsd:enumeration>
+							<xsd:enumeration value="TEXT"></xsd:enumeration>
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
@@ -58,6 +84,10 @@
 				<xsd:element ref="format" minOccurs="0" maxOccurs="1"></xsd:element>
 				<!-- 筛选条件 -->
 				<xsd:element ref="condition" maxOccurs="1"></xsd:element>
+				<!-- 字段差分 -->
+				<xsd:element ref="fieldSeparator"></xsd:element>
+				<!-- 外键策略 -->
+				<!-- <xsd:element name="foreignKey"></xsd:element> -->
 			</xsd:sequence>
 			<!-- field标签的属性 -->
 			<xsd:attribute name="field_restrict">
@@ -89,6 +119,10 @@
 			<xsd:attribute name="type" use="required">
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="LE"></xsd:enumeration>
+						<xsd:enumeration value="LT"></xsd:enumeration>
+						<xsd:enumeration value="GE"></xsd:enumeration>
+						<xsd:enumeration value="GT"></xsd:enumeration>
 						<xsd:enumeration value="LIKE"></xsd:enumeration>
 						<xsd:enumeration value="LLIKE"></xsd:enumeration>
 						<xsd:enumeration value="RLIKE"></xsd:enumeration>
@@ -100,4 +134,17 @@
 			</xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
+	
+	<xsd:element name="fieldSeparator">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="separator_class_name" type="xsd:string" minOccurs="1"></xsd:element>
+				<xsd:element name="separator_class_arg" type="xsd:string"></xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<!-- <xsd:element name="foreignKey">
+		
+	</xsd:element> -->
 </xsd:schema>

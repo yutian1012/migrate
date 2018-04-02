@@ -15,8 +15,8 @@ public class PatentNoFormater implements Formater{
 		String appNumber=(String) value;
 		//转大写
 		appNumber=appNumber.trim().toUpperCase();
-		//去掉空白
-		appNumber=appNumber.replaceAll("[\\s\\t]+", "");
+		//去掉空白，只保留字母和数字以及小数点
+		appNumber=appNumber.replaceAll("[^a-zA-Z\\d\\.]", "");
 		//添加CN标记
 		if(!appNumber.startsWith("CN")){
 			appNumber=appNumber.replaceFirst("^[A-Z]{2}", "");
@@ -30,10 +30,20 @@ public class PatentNoFormater implements Formater{
 		}
 		
 		if(!PatentValidationUtil.isValidAppNumber(appNumber)){
-			throw new PatentFormatException("专利号错误，无法进行格式化："+value);
+			throw new PatentFormatException("专利号格式化异常："+value);
 		}
 		
 		return appNumber;
+	}
+	
+	public static void main(String[] args) {
+		PatentNoFormater patentNoFormater=new PatentNoFormater();
+		try {
+			System.out.println(patentNoFormater.format(null, "CN201410833785.0 "));
+		} catch (FormatException e) {
+			e.printStackTrace();
+		}
+	
 	}
 	
 }

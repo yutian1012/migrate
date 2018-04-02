@@ -10,6 +10,7 @@ public class FieldModel implements Cloneable{
 	private FieldRestrictEnum restrict;//键值的约束问题
 	private FieldFormatModel format;
 	private FieldConditionModel condition;
+	private FieldSeparatorModel fieldSeparatorModel;
 	
 	public String getFrom() {
 		return from;
@@ -53,6 +54,12 @@ public class FieldModel implements Cloneable{
 	}
 	public void setCondition(FieldConditionModel condition) {
 		this.condition = condition;
+	}
+	public FieldSeparatorModel getFieldSeparatorModel() {
+		return fieldSeparatorModel;
+	}
+	public void setFieldSeparatorModel(FieldSeparatorModel fieldSeparatorModel) {
+		this.fieldSeparatorModel = fieldSeparatorModel;
 	}
 	public FieldModel copyFieldModel(){
 		try {

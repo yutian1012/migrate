@@ -1,6 +1,7 @@
 package org.ipph.migration.sql;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,10 +10,14 @@ import javax.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.ipph.condition.ConditionContext;
 import org.ipph.exception.FormatException;
+import org.ipph.exception.SeparatorException;
 import org.ipph.format.FormaterContext;
 import org.ipph.model.FieldModel;
 import org.ipph.model.FieldRestrictEnum;
+import org.ipph.model.SubtableModel;
 import org.ipph.model.TableModel;
+import org.ipph.separator.SeparatorContext;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +33,8 @@ public class SqlOperation {
 	private FormaterContext formaterContext;
 	@Resource
 	private ConditionContext conditionContext;
+	@Resource
+	private SeparatorContext separatorContext;
 	
 	private int batch=100;
 	
@@ -51,7 +58,16 @@ public class SqlOperation {
 	 */
 	public void migrateTable(TableModel table){
 		if(null==table|| table.isSkip()) return;
-		
+		//迁移主表
+		migrateMasterTable(table);
+		//迁移子表
+		migrateSubTableList(table);
+	}
+	/**
+	 * 迁移主表数据
+	 * @param table
+	 */
+	private void migrateMasterTable(TableModel table){
 		String select=sqlBuilder.getSelectSql(table);
 		
 		if(null==select) return;
@@ -67,7 +83,7 @@ public class SqlOperation {
 		}
 		
 		//List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select+" limit 0,100");
-		List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select,handleFieldCondition(table));
+		List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select+" limit 0,1",handleFieldCondition(table));
 		
 		if(null!=result){
 			for(Map<String,Object> row:result){
@@ -78,14 +94,151 @@ public class SqlOperation {
 							continue;
 						}
 					}
-					toJdbcTemplate.update(insert, handleRowData(row,table));
+					int ins=toJdbcTemplate.update(insert, handle2UpdRowData(row,table));
+					if(ins>0){
+						if(log.isDebugEnabled()){
+							log.debug("insert the data success!");
+						}
+					}
 				}catch(FormatException e){
 					e.printStackTrace();
-					log.error("格式化数据错误"+e.getCause().getMessage());
+					log.error("格式化数据错误"+e.getMessage());
+				}catch (Exception e) {
+					e.printStackTrace();
+					log.error("语句执行错误"+e.getMessage());
 				}
 			}
 		}
 	}
+	/**
+	 * 处理子表集合
+	 * @param table
+	 */
+	private void migrateSubTableList(TableModel table){
+		List<SubtableModel> subTablelist=table.getSubTableList();
+		if(null!=subTablelist&&subTablelist.size()>0){
+			for(SubtableModel subTable:subTablelist){
+				if(null==subTable||subTable.isSkip()==true) continue;
+				
+				migrateSubTable(subTable);
+			}
+		}
+	}
+	
+	/**
+	 * 数据库迁移操作--处理子表
+	 * @param fromTable
+	 * @param targetTable
+	 */
+	private void migrateSubTable(SubtableModel table){
+		
+		if(null==table|| table.isSkip()) return;
+		
+		String select=sqlBuilder.getSelectSql(table);
+		
+		if(null==select) return;
+		
+		String insert=sqlBuilder.getInsertSql(table);
+		
+		if(null==insert) return;
+		
+		if(log.isDebugEnabled()){
+			log.debug("执行插入语句："+insert);
+		}
+		
+		//List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select+" limit 0,100");
+		List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select+" limit 0,2",handleFieldCondition(table));
+		
+		if(null!=result){
+			for(Map<String,Object> row:result){
+				try{
+					//int ins=toJdbcTemplate.update(insert, handle2UpdRowData(row,table));
+					int ins=migrateSubTableRow(insert, row, table);
+					if(ins>0){
+						if(log.isDebugEnabled()){
+							log.debug("insert the data success!");
+						}
+					}
+				}catch(FormatException e){
+					e.printStackTrace();
+					log.error("格式化数据错误"+e.getMessage());
+				}catch(SeparatorException e){
+					e.printStackTrace();
+					log.error("数据字段拆分错误"+e.getMessage());
+				}catch(Exception e){
+					e.printStackTrace();
+					log.error("语句执行错误"+e.getMessage());
+				}
+			}
+		}
+	}
+	/**
+	 * 处理将拆分的每一行数据
+	 * @param insert
+	 * @param row
+	 * @param table
+	 * @return
+	 * @throws FormatException 
+	 * @throws DataAccessException 
+	 * @throws SeparatorException 
+	 */
+	private int migrateSubTableRow(String insert,Map<String,Object> row,SubtableModel table) throws DataAccessException, FormatException, SeparatorException{
+		List<FieldModel> separatorFieldList=new ArrayList<>();
+		for(FieldModel field:table.getFiledList()){
+			if(null!=field.getFieldSeparatorModel()){
+				separatorFieldList.add(field);
+			}
+		}
+		
+		if(separatorFieldList.size()==0){
+			return toJdbcTemplate.update(insert, handle2UpdRowData(row,table));
+		}
+		Map<String,List<Object>> separatorDataMap=new HashMap<>();
+		for(FieldModel field:separatorFieldList){
+			separatorDataMap.put(field.getFrom(), separatorContext.getSperateValue(field.getFieldSeparatorModel(),row.get(field.getFrom())));
+		}
+		
+		boolean flag=true;
+		int size=0;
+		for(FieldModel field:separatorFieldList){
+			if(size==0){
+				size=separatorDataMap.get(field.getFrom()).size();
+			}else if(size!=separatorDataMap.get(field.getFrom()).size()){//判断所有集合长度是否相同，如果不同，则证明字段拆分的有问题，数量不匹配
+				flag=false;
+				break;
+			}
+		}
+		
+		if(!flag){
+			throw new SeparatorException("字段拆分数量不匹配：");
+		}
+		
+		List<Map<String,Object>> dataList=new ArrayList<>();
+		for(int i=0;i<size;i++){
+			Map<String,Object> data=new HashMap<>();
+			for(FieldModel field:table.getFiledList()){
+				Object value=null;
+				if(null!=field.getFieldSeparatorModel()){
+					value=separatorDataMap.get(field.getFrom()).get(i);
+				}else{
+					value=row.get(field.getFrom());
+				}
+				
+				data.put(field.getFrom(), value);
+			}
+			dataList.add(data);
+		}
+		
+		//执行sql语句
+		int num=0;
+		for(Map<String,Object> data:dataList){
+			num+=toJdbcTemplate.update(insert, handle2UpdRowData(data,table));
+		}
+		
+		return num;
+		
+	}
+	
 	/**
 	 * 更新目标表数据
 	 * @param table
@@ -114,15 +267,22 @@ public class SqlOperation {
 			for(Map<String,Object> row:result){
 				try{
 					if(null!=toUpdSelect){
-						Object[] o=handle2UpdWereRowData(row,table);
 						Map<String,Object> res=toJdbcTemplate.queryForMap(toUpdSelect,handle2UpdWereRowData(row,table));
 						if(null!=res.get("num")&&(Long)res.get("num")==0L){//唯一键是否重复
 							log.error("数据记录不存在："+row);
 							continue;
 						}
 					}
-					Object[] o=handle2UpdRowData(row,table);
-					toJdbcTemplate.update(update, handle2UpdRowData(row,table));
+					//Object[] o=handle2UpdRowData(row,table);
+					int upd=toJdbcTemplate.update(update, handle2UpdRowData(row,table));
+					if(upd>0){
+						if(log.isDebugEnabled()){
+							log.debug("update the data success!");
+						}
+					}else{
+						log.error("not found the data!");
+					}
+					
 				}catch(FormatException e){
 					e.printStackTrace();
 					log.error("格式化数据错误"+e.getMessage());
@@ -138,16 +298,21 @@ public class SqlOperation {
 	 * @return
 	 * @throws Exception 
 	 */
-	private Object[] handleRowData(Map<String,Object> row,TableModel table) throws FormatException{
-		Object[] result=new Object[table.getFiledList().size()];
+	/*private Object[] handleRowData(Map<String,Object> row,TableModel table) throws FormatException{
 		
-		for(int i=0;i<table.getFiledList().size();i++){
-			FieldModel field=table.getFiledList().get(i);
-			result[i]=processFieldValue(row, field);
+		List<Object> result=new ArrayList<>();
+		
+		for(FieldModel field:table.getFiledList()){
+			if(null==field.getTo()||"".equals(field.getTo())){
+				continue;
+			}
+			
+			result.add(processFieldValue(row, field));
 		}
 		
-		return result;
-	}
+		return result.toArray();
+		
+	}*/
 	
 	/**
 	 * 处理唯一键行数据并返回数值数组
@@ -222,8 +387,10 @@ public class SqlOperation {
 			value=formaterContext.getFormatedValue(field.getFormat(),row.get(field.getFrom()));
 		}
 		//处理默认值
-		if(null==value&&null!=field.getDefaultValue()&&!"".equals(field.getDefaultValue())){
-			value=field.getDefaultValue().trim();
+		if(null==value||"".equals(value)){
+			if(null!=field.getDefaultValue()&&!"".equals(field.getDefaultValue())){
+				value=field.getDefaultValue().trim();
+			}
 		}
 		return value;
 	}
