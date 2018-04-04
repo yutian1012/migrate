@@ -18,13 +18,6 @@ public class ConditionDefaultImpl implements Condition{
 			return null;
 		
 		return fieldConditionModel.getValue();
-		/*String value=fieldConditionModel.getValue();
-		if("null".equals(value)||"NULL".equals(value)){
-			return null;
-		}else{
-			return value;
-		}*/
-		
 	}
 
 }

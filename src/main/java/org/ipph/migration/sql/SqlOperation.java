@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.Resource;
 
@@ -17,6 +19,7 @@ import org.ipph.model.FieldRestrictEnum;
 import org.ipph.model.SubtableModel;
 import org.ipph.model.TableModel;
 import org.ipph.separator.SeparatorContext;
+import org.ipph.thread.NamedThreadFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -30,13 +33,17 @@ public class SqlOperation {
 	@Resource
 	private JdbcTemplate toJdbcTemplate;
 	@Resource
+	private JdbcTemplate errorJdbcTemplate;
+	@Resource
 	private FormaterContext formaterContext;
 	@Resource
 	private ConditionContext conditionContext;
 	@Resource
 	private SeparatorContext separatorContext;
 	
-	private int batch=100;
+	private int batch=50;
+	
+	private ExecutorService threadPool = Executors.newFixedThreadPool(10, new NamedThreadFactory("migration"));
 	
 	private Logger log=Logger.getLogger(SqlOperation.class);
 	
@@ -59,10 +66,170 @@ public class SqlOperation {
 	public void migrateTable(TableModel table){
 		if(null==table|| table.isSkip()) return;
 		//迁移主表
-		migrateMasterTable(table);
+		//migrateMasterTable(table);
+		migrateMasterTableBatch(table);
 		//迁移子表
 		migrateSubTableList(table);
 	}
+	
+	private void migrateMasterTableBatchThreadPool(TableModel table){
+		String select=sqlBuilder.getSelectSql(table);
+		
+		if(null==select) return;
+		
+		String insert=sqlBuilder.getInsertSql(table);
+		
+		if(null==insert) return;
+		
+		String uniqueSelect=sqlBuilder.getUniqueFieldSelect(table);
+		
+		if(log.isDebugEnabled()){
+			log.debug("执行插入语句："+insert);
+		}
+		
+		//获取记录数量
+		String selectCount=sqlBuilder.getSelectCountSql(table);
+		
+		Map<String, Object> count=fromJdbcTemplate.queryForMap(selectCount,handleFieldCondition(table));
+		
+		long total=0;
+		
+		if(null!=count.get("num")&&(Long)count.get("num")>0L){//唯一键是否重复
+			total=(Long)count.get("num");
+		}
+		
+		List<Object[]> batchDataList=new ArrayList<>();
+		List<Map<String,Object>> result=null;
+		for(int index=0;index<total;index+=batch){
+			String limitSql=null;
+			if(index+batch>total){
+				limitSql=select+" limit "+index+","+total;
+			}else{
+				limitSql=select+" limit "+index+","+batch;
+			}
+			System.out.println(limitSql);
+			result=fromJdbcTemplate.queryForList(limitSql,handleFieldCondition(table));
+			
+			if(null!=result){
+				
+				for(Map<String,Object> row:result){
+					try{
+						if(null!=uniqueSelect){
+							Map<String,Object> res=toJdbcTemplate.queryForMap(uniqueSelect,handleUniqueRowData(row,table));
+							if(null!=res.get("num")&&(Long)res.get("num")>0L){//唯一键是否重复
+								continue;
+							}
+						}
+						batchDataList.add(handle2UpdRowData(row,table));
+					}catch(FormatException e){
+						e.printStackTrace();
+						log.error("格式化数据错误"+e.getMessage());
+					}
+				}
+				try{	
+					if(batchDataList.size()>0){
+						int[] ins=toJdbcTemplate.batchUpdate(insert,batchDataList );
+						/*if(ins>0){
+							if(log.isDebugEnabled()){
+								log.debug("insert the data success!");
+							}
+						}*/
+					}
+				}catch (Exception e) {
+					e.printStackTrace();
+					log.error("语句执行错误"+e.getMessage());
+				}
+			}
+			
+			batchDataList.clear();
+		}
+		
+		//List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select+" limit 0,100");
+		
+	}
+	
+	/**
+	 * 迁移主表数据
+	 * @param table
+	 */
+	private void migrateMasterTableBatch(TableModel table){
+		String select=sqlBuilder.getSelectSql(table);
+		
+		if(null==select) return;
+		
+		String insert=sqlBuilder.getInsertSql(table);
+		
+		if(null==insert) return;
+		
+		String uniqueSelect=sqlBuilder.getUniqueFieldSelect(table);
+		
+		if(log.isDebugEnabled()){
+			log.debug("执行插入语句："+insert);
+		}
+		
+		//获取记录数量
+		String selectCount=sqlBuilder.getSelectCountSql(table);
+		
+		Map<String, Object> count=fromJdbcTemplate.queryForMap(selectCount,handleFieldCondition(table));
+		
+		long total=0;
+		
+		if(null!=count.get("num")&&(Long)count.get("num")>0L){//唯一键是否重复
+			total=(Long)count.get("num");
+		}
+		
+		//批次处理
+		
+		List<Object[]> batchDataList=new ArrayList<>();
+		List<Map<String,Object>> result=null;
+		for(int index=0;index<total;index+=batch){
+			String limitSql=null;
+			if(index+batch>total){
+				limitSql=select+" limit "+index+","+total;
+			}else{
+				limitSql=select+" limit "+index+","+batch;
+			}
+			System.out.println(limitSql);
+			result=fromJdbcTemplate.queryForList(limitSql,handleFieldCondition(table));
+			
+			if(null!=result){
+				
+				for(Map<String,Object> row:result){
+					try{
+						if(null!=uniqueSelect){
+							Map<String,Object> res=toJdbcTemplate.queryForMap(uniqueSelect,handleUniqueRowData(row,table));
+							if(null!=res.get("num")&&(Long)res.get("num")>0L){//唯一键是否重复
+								continue;
+							}
+						}
+						batchDataList.add(handle2UpdRowData(row,table));
+					}catch(FormatException e){
+						e.printStackTrace();
+						log.error("格式化数据错误"+e.getMessage());
+					}
+				}
+				try{	
+					if(batchDataList.size()>0){
+						int[] ins=toJdbcTemplate.batchUpdate(insert,batchDataList );
+						/*if(ins>0){
+							if(log.isDebugEnabled()){
+								log.debug("insert the data success!");
+							}
+						}*/
+					}
+				}catch (Exception e) {
+					e.printStackTrace();
+					log.error("语句执行错误"+e.getMessage());
+				}
+			}
+			
+			batchDataList.clear();
+		}
+		
+		//List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select+" limit 0,100");
+		
+	}
+	
 	/**
 	 * 迁移主表数据
 	 * @param table
@@ -82,8 +249,10 @@ public class SqlOperation {
 			log.debug("执行插入语句："+insert);
 		}
 		
+		String errorInsert=sqlBuilder.getErrorInsertSql(table);
+		
 		//List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select+" limit 0,100");
-		List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select+" limit 0,1",handleFieldCondition(table));
+		List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select,handleFieldCondition(table));
 		
 		if(null!=result){
 			for(Map<String,Object> row:result){
@@ -103,9 +272,19 @@ public class SqlOperation {
 				}catch(FormatException e){
 					e.printStackTrace();
 					log.error("格式化数据错误"+e.getMessage());
+					try {
+						errorJdbcTemplate.update(errorInsert,handle2ErrorRowData(row,table));
+					} catch (Exception e1) {
+						
+					}
 				}catch (Exception e) {
 					e.printStackTrace();
 					log.error("语句执行错误"+e.getMessage());
+					try {
+						errorJdbcTemplate.update(errorInsert,handle2ErrorRowData(row,table));
+					} catch (Exception e1) {
+						
+					}
 				}
 			}
 		}
@@ -147,7 +326,7 @@ public class SqlOperation {
 		}
 		
 		//List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select+" limit 0,100");
-		List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select+" limit 0,2",handleFieldCondition(table));
+		List<Map<String,Object>> result=fromJdbcTemplate.queryForList(select,handleFieldCondition(table));
 		
 		if(null!=result){
 			for(Map<String,Object> row:result){
@@ -267,7 +446,7 @@ public class SqlOperation {
 			for(Map<String,Object> row:result){
 				try{
 					if(null!=toUpdSelect){
-						Map<String,Object> res=toJdbcTemplate.queryForMap(toUpdSelect,handle2UpdWereRowData(row,table));
+						Map<String,Object> res=toJdbcTemplate.queryForMap(toUpdSelect,handle2UpdWhereRowData(row,table));
 						if(null!=res.get("num")&&(Long)res.get("num")==0L){//唯一键是否重复
 							log.error("数据记录不存在："+row);
 							continue;
@@ -339,7 +518,7 @@ public class SqlOperation {
 	 * @return
 	 * @throws FormatException
 	 */
-	private Object[] handle2UpdWereRowData(Map<String,Object> row,TableModel table)throws FormatException{
+	private Object[] handle2UpdWhereRowData(Map<String,Object> row,TableModel table)throws FormatException{
 		List<Object> result=new ArrayList<>();
 		
 		for(FieldModel field:table.getFiledList()){
@@ -374,6 +553,27 @@ public class SqlOperation {
 		
 		return result.toArray();
 	}
+	
+	/**
+	 * 获取待更新字段的参数值
+	 * @param row
+	 * @param table
+	 * @return
+	 * @throws FormatException
+	 */
+	private Object[] handle2ErrorRowData(Map<String,Object> row,TableModel table)throws FormatException{
+		List<Object> result=new ArrayList<>();
+		
+		for(FieldModel field:table.getFiledList()){
+			if(null==field.getFrom()||"".equals(field.getFrom())){
+				continue;
+			}
+			result.add(row.get(field.getFrom()));
+		}
+		
+		return result.toArray();
+	}
+	
 	/**
 	 * 处理字段值
 	 * @param row

@@ -33,7 +33,7 @@
     	</fields>
     </table>
     <!-- 专利申请数据的更新 -->
-    <table type="UPDATE" to="z_patent" from="tpatentallo2" skip="true">
+    <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
     	<fields>
     		<!-- to有值，from无值作为待更新的字段 ,待更新字段必须在上方-->
     		<field to="isApply" from="" field_default="1"></field>
@@ -56,7 +56,7 @@
     	</fields>
     </table>
     <!-- 专利授权数据的更新 -->
-    <table type="UPDATE" to="z_patent" from="tpatentallo2" skip="true">
+    <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
     	<fields>
     		<!-- to有值，from无值作为待更新的字段 ,待更新字段必须在上方-->
     		<field to="isCity" from="" field_default="1"></field>
@@ -79,7 +79,7 @@
     	</fields>
     </table>
     <!-- pct申请数据 -->
-    <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo2" skip="true">
+    <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo" skip="true">
     	<fields>
 			<field to="id" from="id"></field>    	
     		<field to="patentName" from="patentName"></field>
@@ -107,7 +107,7 @@
     	</fields>
     </table>
     <!-- pct授权数据 -->
-    <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo2" skip="true">
+    <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo" skip="true">
     	<fields>
 			<field to="id" from="id"></field>    	
     		<field to="patentName" from="patentName"></field>
@@ -192,7 +192,7 @@
     		</field>
     	</fields>
     	<!-- 字段拆分出来的子表-著作权人子表信息 -->
-    	<subTable name="cs_copyright_owner">
+    	<subTable name="cs_copyright_owner" skip="true">
     		<fields>
     			<!-- <field to="id" from="id">
     				
@@ -275,7 +275,7 @@
     		</field>
     	</fields>
     	<!-- 字段拆分出来的子表 -->
-    	<subTable name="cs_copyright_owner">
+    	<subTable name="cs_copyright_owner" skip="true">
     		<fields>
     			<!-- <field to="id" from="id">
     				
