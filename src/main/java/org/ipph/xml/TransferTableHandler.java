@@ -100,6 +100,8 @@ public class TransferTableHandler extends DefaultHandler {
         	fieldSeparatorModel=new FieldSeparatorModel();
         }else if(XmlElement.field_condition.equals(qName)){//条件
         	fieldConditionModel=new FieldConditionModel();
+        	String type=attributes.getValue("type");
+        	FieldConditionTypeEnum[] arr=FieldConditionTypeEnum.values();
         	fieldConditionModel.setConditionType(FieldConditionTypeEnum.valueOf(attributes.getValue("type")));
         }
     };

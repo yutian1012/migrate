@@ -15,6 +15,10 @@ public class SeparatorContext {
 	private CharacterSeparator separator;
 	
 	public List<Object> getSperateValue(FieldSeparatorModel fieldSeparatorModel,Object value ) throws SeparatorException {
+		if(null==value){
+			throw new SeparatorException("字段值为空");
+		}
+		
 		if(null==fieldSeparatorModel) {
 			List<Object> result=new ArrayList<>();
 			result.add(value);

@@ -16,4 +16,9 @@ public class ConditionInImpl implements Condition{
 		return null;
 	}
 
+	@Override
+	public boolean isValueSkip() {
+		return false;
+	}
+
 }

@@ -7,4 +7,6 @@ public interface Condition {
 	public String getConditionParam(FieldConditionModel fieldConditionModel);
 	
 	public Object getConditionParamValue(FieldConditionModel fieldConditionModel);
+	
+	public boolean isValueSkip();
 }

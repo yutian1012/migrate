@@ -2,7 +2,7 @@
 <tables xmlns="http://www.migrate.org/schema/tables"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
    xsi:schemaLocation="http://www.migrate.org/schema/tables tables.xsd">
     <!-- 系统用户数据 -->
-    <table type="MIGRATE" to="sys_user" from="twxuser" skip="true">
+    <table type="MIGRATE" to="sys_user" from="twxuser">
     	<fields>
 			<field to="userid" from="id"></field>    	
     		<field to="account" from="loginname"></field>
@@ -14,7 +14,7 @@
     				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
     				<format_class_arg>{'GR':'2','QY':'1','GX':'3'}</format_class_arg>
     			</format>
-    			<condition type="NEQUAL">null</condition>
+    			<condition type="ISNOTNULL"></condition>
     		</field>
     		<field to="cardid" from="idcard"></field>
     		<field to="address" from="address"></field>
@@ -135,15 +135,13 @@
     	</fields>
     </table>
     <!-- 软件著作权登记信息 -->
-    <table type="MIGRATE" from="tcopyrightreg" to="cs_copyright">
+    <table type="MIGRATE" from="tcopyrightreg" to="cs_copyright"  skip="true">
     	<fields>
     		<!-- 作品信息 -->
     		<field to="id" from="id"></field>
     		<field to="copyrightNo" from="receiptNo"></field>
     		<field to="copyrightName" from="workname"></field>
-    		<field to="copyrightType" from="workType">
-    			<format></format>
-    		</field>
+    		<field to="copyrightType" from="workType"></field>
     		<field to="copyrightTypeMsg" from="notes"></field>
     		<!-- 作者姓名 -->
     		<field to="authorName" from="authorname"></field>
@@ -192,7 +190,7 @@
     		</field>
     	</fields>
     	<!-- 字段拆分出来的子表-著作权人子表信息 -->
-    	<subTable name="cs_copyright_owner" skip="true">
+    	<subTable name="cs_copyright_owner">
     		<fields>
     			<!-- <field to="id" from="id">
     				
@@ -203,6 +201,7 @@
     					<!-- 分隔符定义为:逗号,分号,\,/,空格以及冒号 -->
     					<separator_class_arg>[,;\/ :]</separator_class_arg>
     				</fieldSeparator>
+    				<condition type="ISNOTNULL"></condition>
     			</field>
     			<field to="ownerType" from="type"></field>
     			<field to="ownerIDtype" from="cardType"></field>
@@ -211,6 +210,9 @@
     			<field to="ownerProvince" from="province"></field>
     			<field to="ownercity" from="city"></field>
     			<field to="signature" from="sign"></field>
+    			<field to="" from="status">
+	    			<condition type="EQUAL">1</condition>
+	    		</field>
     		</fields>
     	</subTable>
     </table>
@@ -286,6 +288,7 @@
     					<!-- 分隔符定义为:逗号,分号,\,/,空格以及冒号 -->
     					<separator_class_arg>[,;\/ :]</separator_class_arg>
     				</fieldSeparator>
+    				<condition type="ISNOTNULL"/>
     			</field>
     			<field to="ownerType" from="type"></field>
     			<field to="ownerIDtype" from="cardType"></field>

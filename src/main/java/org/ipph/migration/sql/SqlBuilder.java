@@ -3,19 +3,13 @@ package org.ipph.migration.sql;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
-import org.ipph.condition.ConditionContext;
 import org.ipph.model.FieldModel;
 import org.ipph.model.FieldRestrictEnum;
 import org.ipph.model.TableModel;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SqlBuilder {
-	
-	@Resource
-	private ConditionContext conditionContext;
+public class SqlBuilder extends BaseSqlBuilder{
 	
 	/**
 	 * 获取查询语句
@@ -29,32 +23,32 @@ public class SqlBuilder {
 		}
 		
 		StringBuilder sbuilder=new StringBuilder();
-		List<FieldModel> conditionFieldList=new ArrayList<>();
+		List<String> fieldList=new ArrayList<>();
+		List<FieldModel> conditionList=new ArrayList<>();
 		
 		//select查询字段
-		sbuilder.append("select ");
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getFrom()||"".equals(field.getFrom())) continue;
 			
-			sbuilder.append(field.getFrom()).append(",");
+			fieldList.add(field.getFrom());
 			
 			if(null!=field.getCondition()&&null!=field.getCondition().getValue()){
-				conditionFieldList.add(field);
+				conditionList.add(field);
 			}
 		}
-		sbuilder.setLength(sbuilder.length()-1);//去掉末尾的逗号
-		sbuilder.append(" from ").append(tableModel.getFrom());
 		
-		//where条件构造
-		if(conditionFieldList.size()>0){
-			sbuilder.append(" where 1=1 ");
-			for(FieldModel field:conditionFieldList){
-				String condition=conditionContext.getConditionParam(field);
-				if(null!=condition){
-					sbuilder.append("and ").append(field.getFrom()).append(" ").append(condition);
-				}
-			}
+		String sql=getSelectSql(tableModel.getFrom(), fieldList);
+		
+		if(null!=sql){
+			sbuilder.append(sql);
 		}
+		
+		String condition=getWhereByConditionField(conditionList);
+		
+		if(null!=condition){
+			sbuilder.append(condition);
+		}
+		
 		return sbuilder.toString();
 	}
 	/**
@@ -69,29 +63,28 @@ public class SqlBuilder {
 		}
 		
 		StringBuilder sbuilder=new StringBuilder();
-		List<FieldModel> conditionFieldList=new ArrayList<>();
+		List<FieldModel> conditionList=new ArrayList<>();
 		
-		//select查询字段
-		sbuilder.append("select count(1) num ");
-		sbuilder.append(" from ").append(tableModel.getFrom());
 		
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getFrom()||"".equals(field.getFrom())) continue;
 			
 			if(null!=field.getCondition()&&null!=field.getCondition().getValue()){
-				conditionFieldList.add(field);
+				conditionList.add(field);
 			}
 		}
-		//where条件构造
-		if(conditionFieldList.size()>0){
-			sbuilder.append(" where 1=1 ");
-			for(FieldModel field:conditionFieldList){
-				String condition=conditionContext.getConditionParam(field);
-				if(null!=condition){
-					sbuilder.append("and ").append(field.getFrom()).append(" ").append(condition);
-				}
-			}
+		String sql=getCountSql(tableModel.getFrom());
+		
+		if(null!=sql){
+			sbuilder.append(sql);
 		}
+		
+		String condition=getWhereByConditionField(conditionList);
+		
+		if(null!=condition){
+			sbuilder.append(condition);
+		}
+		
 		return sbuilder.toString();
 	}
 	/**
@@ -105,25 +98,19 @@ public class SqlBuilder {
 			return null;
 		}
 		
-		StringBuilder sbuilder=new StringBuilder();
-		sbuilder.append("insert into ").append(tableModel.getTo()).append(" (");
+		List<String> fieldList=new ArrayList<>();
+		
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getTo()||"".equals(field.getTo())){
 				continue;
 			}
-			sbuilder.append(field.getTo()).append(",");
+			fieldList.add(field.getTo());
 		}
-		sbuilder.setLength(sbuilder.length()-1);
-		sbuilder.append(" )").append(" VALUES (");
-		for(FieldModel field:tableModel.getFiledList()){
-			if(null==field.getTo()||"".equals(field.getTo())){
-				continue;
-			}
-			sbuilder.append("?").append(",");
+		
+		if(fieldList.size()>0){
+			return getInsertSql(tableModel.getTo(),fieldList);
 		}
-		sbuilder.setLength(sbuilder.length()-1);
-		sbuilder.append(")");
-		return sbuilder.toString();
+		return null;
 	}
 	/**
 	 * 错误记录插入语句
@@ -135,26 +122,22 @@ public class SqlBuilder {
 			return null;
 		}
 		
-		StringBuilder sbuilder=new StringBuilder();
-		sbuilder.append("insert into ").append(tableModel.getFrom()).append(" (");
+		List<String> fieldList=new ArrayList<>();
+		
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getFrom()||"".equals(field.getFrom())){
 				continue;
 			}
-			sbuilder.append(field.getFrom()).append(",");
+			fieldList.add(field.getFrom());
 		}
-		sbuilder.setLength(sbuilder.length()-1);
-		sbuilder.append(" )").append(" VALUES (");
-		for(FieldModel field:tableModel.getFiledList()){
-			if(null==field.getFrom()||"".equals(field.getFrom())){
-				continue;
-			}
-			sbuilder.append("?").append(",");
+		
+		if(fieldList.size()>0){
+			return getInsertSql(tableModel.getFrom(),fieldList);
 		}
-		sbuilder.setLength(sbuilder.length()-1);
-		sbuilder.append(")");
-		return sbuilder.toString();
+		return null;
 	}
+	
+	
 	
 	/**
 	 * 获取update语句
@@ -167,31 +150,34 @@ public class SqlBuilder {
 		}
 		
 		StringBuilder sbuilder=new StringBuilder();
-		sbuilder.append("update ").append(tableModel.getTo()).append(" set ");
+		List<String> fieldList=new ArrayList<>();
+		List<String> conditionList=new ArrayList<>();
 		
-		//to有值，from无值作为待更新的字段
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getTo()||"".equals(field.getTo())){
 				continue;
 			}
 			if(null==field.getFrom()||"".equals(field.getFrom())){
-				sbuilder.append(field.getTo()).append(" = ? ").append(",");
+				//to有值，from无值作为待更新的字段
+				fieldList.add(field.getTo());
+			}else{
+				//两个都有值作为更新条件字段
+				conditionList.add(field.getTo());
 			}
 		}
-		sbuilder.setLength(sbuilder.length()-1);
-
-		sbuilder.append(" where 1=1 ");
 		
-		//from和to两个都有值作为关联条件
-		for(FieldModel field:tableModel.getFiledList()){
-			if(null==field.getTo()||"".equals(field.getTo())){
-				continue;
-			}
-			if(null==field.getFrom()||"".equals(field.getFrom())){
-				continue;
-			}
-			sbuilder.append(" and ").append(field.getTo()).append(" = ? ");
+		String sql=getUpdateSql(tableModel.getTo(), fieldList);
+		
+		if(null!=sql){
+			sbuilder.append(sql);
 		}
+		
+		String condition=getWhereByField(conditionList);
+		
+		if(null!=condition){
+			sbuilder.append(condition);
+		}
+		
 		return sbuilder.toString();
 	}
 	
@@ -200,37 +186,50 @@ public class SqlBuilder {
 	 * @param tableModel
 	 * @return
 	 */
-	public String getUniqueFieldSelect(TableModel tableModel){
-		List<FieldModel> uniqueFieldList=new ArrayList<>();
+	public String isUniqueFieldExistsSelectSql(TableModel tableModel){
+		List<String> uniqueFieldList=new ArrayList<>();
 		if(tableModel.getFiledList().size()==0){
 			return null;
 		}
 		
+		StringBuilder sbuilder=new StringBuilder();
+		
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null!=field.getRestrict()&&field.getRestrict()==FieldRestrictEnum.UNIQUE){
-				uniqueFieldList.add(field);
+				if(null!=field.getTo())
+					uniqueFieldList.add(field.getTo());
 			}
 		}
+		String sql=getCountSql(tableModel.getTo());
 		
-		if(uniqueFieldList.size()>0){
-			return getCountSql(tableModel.getTo(), uniqueFieldList);
+		if(null!=sql){
+			sbuilder.append(sql);
+		}
+		
+		String condition=getWhereByField(uniqueFieldList);
+		
+		if(null!=condition&&!"".equals(condition)){
+			sbuilder.append(condition);
+			return sbuilder.toString();
 		}
 		return null;
 		
 	}
 	/**
 	 * 获取待更新记录信息是否存在的判断语句
+	 * 更新数据时调用
 	 * @param tableModel
 	 * @return
 	 */
-	public String get2UpdFieldSelect(TableModel tableModel){
-		
-		List<FieldModel> toUpdFieldList=new ArrayList<>();
+	public String isExistSelectSql(TableModel tableModel){
 		
 		if(tableModel.getFiledList().size()==0){
 			return null;
 		}
-		//from和to两个都有值作为关联条件
+		
+		StringBuilder sbuilder=new StringBuilder();
+		List<FieldModel> toUpdFieldList=new ArrayList<>();
+		
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getTo()||"".equals(field.getTo())){
 				continue;
@@ -238,104 +237,22 @@ public class SqlBuilder {
 			if(null==field.getFrom()||"".equals(field.getFrom())){
 				continue;
 			}
+			//from和to两个都有值作为关联条件
 			toUpdFieldList.add(field);
 		}
 		
-		if(toUpdFieldList.size()>0){
-			return getCountSql(tableModel.getTo(), toUpdFieldList);
-		}
-		return null;
+		String sql=getCountSql(tableModel.getTo());
 		
-	}
-	
-	private String getSelectSql(String tableName,List<String> fieldList,List<FieldModel> conditionList){
-		StringBuilder sbuilder=new StringBuilder();
-		
-		//select查询字段
-		sbuilder.append("select ");
-		
-		for(String field:fieldList){
-			
-			sbuilder.append(field).append(",");
-			
+		if(null!=sql){
+			sbuilder.append(sql);
 		}
 		
-		sbuilder.setLength(sbuilder.length()-1);//去掉末尾的逗号
+		String condition=getWhereByConditionField(toUpdFieldList);
 		
-		sbuilder.append(" from ").append(tableName);
-		
-		return sbuilder.toString();
-	}
-	
-	/**
-	 * 获取统计数量查询语句
-	 * @param tableName
-	 * @param fieldList
-	 * @return
-	 */
-	private String getCountSql(String tableName,List<FieldModel> fieldList){
-		if(fieldList.size()>0){
-			
-			List<String> fieldNameList=new ArrayList<>();
-			
-			for(FieldModel field:fieldList){
-				if(null==field.getTo()||"".equals(field.getTo())){
-					continue;
-				}
-				
-				
-				
-				fieldNameList.add(field.getTo());
-			}
-			
-			if(fieldNameList.size()>0){
-				//return getCountSqlByField(tableName, fieldNameList);
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * 获取统计数量查询语句
-	 * @param tableName
-	 * @param fieldNameList
-	 * @return
-	 */
-	private String getCountSqlByField(String tableName,List<FieldModel> conditionList){
-		
-		StringBuilder sbuilder=new StringBuilder();
-		
-		sbuilder.append("select count(1) num from ").append(tableName);
-		
-		String condition=getWhereCondition(conditionList);
 		if(null!=condition){
 			sbuilder.append(condition);
 		}
-		return sbuilder.toString();
+		return null;
+		
 	}
-	
-	/**
-	 * 获取sql语句的where条件
-	 * @param conditionList
-	 * @return
-	 */
-	private String getWhereCondition(List<FieldModel> conditionList){
-		StringBuilder sbuilder=new StringBuilder();
-		//where条件构造
-		if(null!=conditionList&&conditionList.size()>0){
-			
-			sbuilder.append(" where 1=1 ");
-			
-			for(FieldModel field:conditionList){
-				
-				String condition=conditionContext.getConditionParam(field);
-				
-				if(null!=condition){
-					sbuilder.append("and ").append(field.getFrom()).append(" ").append(condition);
-				}
-			}
-		}
-		return sbuilder.toString();
-	}
-	
 }

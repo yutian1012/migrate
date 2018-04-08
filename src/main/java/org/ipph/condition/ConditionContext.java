@@ -17,6 +17,24 @@ public class ConditionContext {
 	public void setConditionList(List<Condition> conditionList) {
 		this.conditionList = conditionList;
 	}
+	/**
+	 * 是否忽略获取参数值
+	 * 针对 is not null或is null类型的条件
+	 * @return
+	 */
+	public boolean isValueSkip(FieldModel field){
+		
+		if(null==field.getCondition()) return true;
+		
+		FieldConditionTypeEnum conditionType=field.getCondition().getConditionType();
+		
+		Condition condition=getCondition(conditionType);
+		
+		if(null!=condition){
+			return condition.isValueSkip();
+		}
+		return true;
+	}
 
 	/**
 	 * 获取条件参数
@@ -61,6 +79,7 @@ public class ConditionContext {
 		
 		return result;
 	}
+	
 	/**
 	 * 获取condition的处理类
 	 * 有新的处理类需要在此进行配置
@@ -71,8 +90,14 @@ public class ConditionContext {
 		Condition condition=null;
 		switch (conditionType) {
 		case IN:
-			condition=getCondition(InConditionImpl.class);
+			condition=getCondition(ConditionInImpl.class);
 			break;
+		case ISNOTNULL:
+			condition=getCondition(ConditionIsNotNullImpl.class);
+		break;
+		case ISNULL:
+			condition=getCondition(ConditionIsNullImpl.class);
+		break;
 		default:
 			condition=getCondition(ConditionDefaultImpl.class);
 			break;

@@ -64,11 +64,15 @@
     	<property name="conditionList">
     		<list>
     			<ref bean="conditionInImpl"/>
+    			<ref bean="conditionIsNullImpl"/>
+    			<ref bean="conditionIsNotNullImpl"/>
     			<ref bean="conditionDefaultImpl"/>
     		</list>
     	</property>
     </bean>
     
     <bean id="conditionInImpl" class="org.ipph.condition.ConditionInImpl"></bean>
+    <bean id="conditionIsNotNullImpl" class="org.ipph.condition.ConditionIsNotNullImpl"></bean>
+    <bean id="conditionIsNullImpl" class="org.ipph.condition.ConditionIsNullImpl"></bean>
     <bean id="conditionDefaultImpl" class="org.ipph.condition.ConditionDefaultImpl"></bean>
 </beans>

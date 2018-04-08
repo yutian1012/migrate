@@ -123,6 +123,8 @@
 						<xsd:enumeration value="LT"></xsd:enumeration>
 						<xsd:enumeration value="GE"></xsd:enumeration>
 						<xsd:enumeration value="GT"></xsd:enumeration>
+						<xsd:enumeration value="ISNOTNULL"></xsd:enumeration>
+						<xsd:enumeration value="ISNULL"></xsd:enumeration>
 						<xsd:enumeration value="LIKE"></xsd:enumeration>
 						<xsd:enumeration value="LLIKE"></xsd:enumeration>
 						<xsd:enumeration value="RLIKE"></xsd:enumeration>

@@ -17,7 +17,7 @@ public class MigrationTask implements Runnable{
 	
 	@Override
 	public void run() {
-		sqlOperation.migrateTable(table);
+		//sqlOperation.migrateTable(table);
 	}
 	
 }
