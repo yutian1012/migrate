@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.ipph.migration.dao.MigrateDao;
+import org.ipph.migration.service.MigrateService;
 import org.ipph.model.TableModel;
 import org.ipph.util.XmlUtil;
 import org.springframework.context.ApplicationContext;
@@ -14,18 +14,19 @@ import org.xml.sax.SAXException;
 
 public class MigrateMain {
 	public static void main(String[] args) {
+		
 		ApplicationContext context=new ClassPathXmlApplicationContext("applicationContext.xml");
 		
 		String xmlFile=MigrateMain.class.getClassLoader().getResource("tables/User.xml").getPath();
 		//SqlOperation operation=context.getBean(SqlOperation.class);
-		MigrateDao migrateDao=context.getBean(MigrateDao.class);
+		MigrateService migrateService=context.getBean(MigrateService.class);
 		
 		List<TableModel> tableList;
 		try {
 			tableList = XmlUtil.parseBySax(xmlFile);
 			if(null!=tableList){
 				for(TableModel table:tableList){
-					migrateDao.batchTransferTable(table);
+					migrateService.batchTransferTable(table);
 				}
 			}
 		} catch (ParserConfigurationException | SAXException | IOException e) {

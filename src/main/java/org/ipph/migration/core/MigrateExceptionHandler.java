@@ -7,7 +7,9 @@ import javax.annotation.Resource;
 import org.apache.log4j.Logger;
 import org.ipph.exception.DataNotFoundException;
 import org.ipph.exception.FormatException;
+import org.ipph.exception.SeparatorException;
 import org.ipph.migration.data.RowDataHandler;
+import org.ipph.migration.sql.SqlBuilder;
 import org.ipph.model.TableModel;
 import org.ipph.util.MapUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,6 +21,8 @@ public class MigrateExceptionHandler {
 	private JdbcTemplate errorJdbcTemplate;
 	@Resource
 	private RowDataHandler rowDataHandler;
+	@Resource
+	private SqlBuilder sqlBuilder;
 	
 	private Logger log=Logger.getLogger(MigrateExceptionHandler.class);
 	/**
@@ -28,9 +32,10 @@ public class MigrateExceptionHandler {
 	 * @param row
 	 * @param table
 	 */
-	public void formatExceptionHandler(FormatException e,String sql,Map<String,Object> row,TableModel table){
+	public void formatExceptionHandler(FormatException e,Map<String,Object> row,TableModel table){
 		log.error("格式化数据错误"+e.getMessage());
 		log.error("数据对象"+MapUtil.outMapData(row));
+		String sql=sqlBuilder.getErrorInsertSql(table);
 		try {
 			if(null!=sql){
 				errorJdbcTemplate.update(sql,rowDataHandler.handle2ErrorRowData(row,table));
@@ -39,6 +44,25 @@ public class MigrateExceptionHandler {
 			e1.printStackTrace();
 		}
 	}
+	/**
+	 * 数据对象拆分异常
+	 * @param e
+	 * @param row
+	 * @param table
+	 */
+	public void separatorExceptionHandler(SeparatorException e,Map<String,Object> row,TableModel table){
+		log.error("数据字段拆分错误"+e.getMessage());
+		log.error("数据对象"+MapUtil.outMapData(row));
+		String sql=sqlBuilder.getErrorInsertSql(table);
+		try {
+			if(null!=sql){
+				errorJdbcTemplate.update(sql,rowDataHandler.handle2ErrorRowData(row,table));
+			}
+		} catch (FormatException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
 	/**
 	 * 处理消息格式化异常
 	 * @param e

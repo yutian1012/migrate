@@ -12,7 +12,7 @@ public class MapUtil {
 		StringBuilder sbuilder=new StringBuilder();
 		sbuilder.append("data[");
 		for(String key:map.keySet()){
-			sbuilder.append(" key ==> ").append("'").append(map.get(key)).append("'");
+			sbuilder.append(key).append("==>").append("'").append(map.get(key)).append("'");
 		}
 		
 		sbuilder.append("]");
