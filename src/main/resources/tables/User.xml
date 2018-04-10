@@ -6,7 +6,9 @@
     	<fields>
 			<field to="userid" from="id"></field>    	
     		<field to="account" from="loginname"></field>
-    		<field to="fullname" from="name" field_restrict="UNIQUE"></field>
+    		<field to="fullname" from="name" field_restrict="UNIQUE">
+    			<condition type="ISNOTNULL"></condition>
+    		</field>
     		<field to="password" from="" field_default="a4ayc/80/OGda4BO/1o/V0etpOqiLx1JwB5S3beHW0s="></field>
     		<!-- 针对无法格式化的数据提供默认值 -->
     		<field to="usertype" from="userType" field_default="1">
@@ -32,8 +34,22 @@
     		<field to="submitTime" from="createtime"></field>
     	</fields>
     </table>
+    <!-- 系统管理员表 -->
+    <table type="MIGRATE" to="sys_user" from="tuser" skip="true">
+    	<fields>
+			<field to="userid" from="id"></field>    	
+    		<field to="account" from="loginname"></field>
+    		<field to="fullname" from="name" field_restrict="UNIQUE">
+    			<condition type="ISNOTNULL"></condition>
+    		</field>
+    		<field to="password" from="" field_default="a4ayc/80/OGda4BO/1o/V0etpOqiLx1JwB5S3beHW0s="></field>
+    		<!-- 针对无法格式化的数据提供默认值 -->
+    		<field to="usertype" from="" field_default="1"></field>
+    		<field to="submitTime" from="createtime"></field>
+    	</fields>
+    </table>
     <!-- 专利申请数据的更新 -->
-    <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
+    <table type="UPDATE" to="z_patent" from="tpatentallo">
     	<fields>
     		<!-- to有值，from无值作为待更新的字段 ,待更新字段必须在上方-->
     		<field to="isApply" from="" field_default="1"></field>
@@ -56,7 +72,7 @@
     	</fields>
     </table>
     <!-- 专利授权数据的更新 -->
-    <table type="UPDATE" to="z_patent" from="tpatentallo">
+    <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
     	<fields>
     		<!-- to有值，from无值作为待更新的字段 ,待更新字段必须在上方-->
     		<field to="isCity" from="" field_default="1"></field>
@@ -299,8 +315,6 @@
     		</fields>
     	</subTable>
     </table>
-    
-    
     <!-- 批次信息记录 -->
     
 </tables>

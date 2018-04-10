@@ -1,9 +1,14 @@
 package org.ipph.thread;
 
+import java.util.Arrays;
+
+import org.apache.log4j.Logger;
 import org.ipph.migration.dao.MigrateDao;
 import org.ipph.model.TableModel;
 
 public class MigrationUpdateTask implements Runnable{
+	
+	private Logger log=Logger.getLogger(MigrationUpdateTask.class);
 
 	private MigrateDao migrateDao;
 	
@@ -32,6 +37,11 @@ public class MigrationUpdateTask implements Runnable{
 			//单价操作时传递数量
 			migrateDao.updateTable(table, start, size);
 		}
+		log.error("专利集合数据量"+migrateDao.appnumberSet.size());
+		log.error("重复的专利数据"+migrateDao.repeatSet.size());//Arrays.toString(migrateDao.repeatSet.toArray()));
+		log.error("未检索到的专利数据"+migrateDao.unfindSet.size());
+		
+		log.error("所有数据集"+migrateDao.allSet.size());
 	}
 	
 }

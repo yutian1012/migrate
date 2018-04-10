@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.ipph.migration.data.RowDataHandler;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -29,9 +30,9 @@ public class SqlOperation {
 	
 	//private int batch=50;
 	
-	/*private ExecutorService threadPool = Executors.newFixedThreadPool(10, new NamedThreadFactory("migration"));
+	/*private ExecutorService threadPool = Executors.newFixedThreadPool(10, new NamedThreadFactory("migration"));*/
 	
-	private Logger log=Logger.getLogger(SqlOperation.class);*/
+	private Logger log=Logger.getLogger(SqlOperation.class);
 	
 	/**
 	 * 获取数据
@@ -50,12 +51,20 @@ public class SqlOperation {
 	 */
 	public boolean isExists(String toUpdSelect,Object[] params){
 		if(toUpdSelect!=null){
-			return getTotal(toUpdSelect, params)>0L;
+			Map<String, Object> count=toJdbcTemplate.queryForMap(toUpdSelect,params);
+			long total=0;
+			
+			if(null!=count.get("num")&&(Long)count.get("num")>0L){//唯一键是否重复
+				total=(Long)count.get("num");
+			}
+		
+			return total>0L;
 		}
 		return false;
 	}
 	
 	public long getTotal(String selectCount,Object[] params){
+		
 		Map<String, Object> count=fromJdbcTemplate.queryForMap(selectCount,params);
 		long total=0;
 		

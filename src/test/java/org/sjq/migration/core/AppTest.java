@@ -1,5 +1,8 @@
 package org.sjq.migration.core;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -34,5 +37,15 @@ public class AppTest
     public void testApp()
     {
         assertTrue( true );
+    }
+    
+    public void testSet(){
+    	Long l1=new Long(1L);
+    	Long l2=new Long(1L);
+    	
+    	Set<Long> s=new HashSet<>();
+    	System.out.println(s.add(l1));
+    	System.out.println(s.add(l2));
+    	System.out.println(s.size());
     }
 }

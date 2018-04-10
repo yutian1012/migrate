@@ -228,7 +228,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 		}
 		
 		StringBuilder sbuilder=new StringBuilder();
-		List<FieldModel> toUpdFieldList=new ArrayList<>();
+		List<String> fieldList=new ArrayList<>();
 		
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getTo()||"".equals(field.getTo())){
@@ -238,7 +238,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 				continue;
 			}
 			//from和to两个都有值作为关联条件
-			toUpdFieldList.add(field);
+			fieldList.add(field.getTo());
 		}
 		
 		String sql=getCountSql(tableModel.getTo());
@@ -247,12 +247,12 @@ public class SqlBuilder extends BaseSqlBuilder{
 			sbuilder.append(sql);
 		}
 		
-		String condition=getWhereByConditionField(toUpdFieldList);
+		String condition=getWhereByField(fieldList);
 		
 		if(null!=condition){
 			sbuilder.append(condition);
 		}
-		return null;
+		return sbuilder.toString();
 		
 	}
 }

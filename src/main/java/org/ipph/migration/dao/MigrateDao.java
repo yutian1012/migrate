@@ -2,12 +2,15 @@ package org.ipph.migration.dao;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
+import org.ipph.exception.DataExistsException;
 import org.ipph.exception.DataNotFoundException;
 import org.ipph.exception.FormatException;
 import org.ipph.exception.SeparatorException;
@@ -23,6 +26,7 @@ import org.ipph.separator.SeparatorContext;
 import org.ipph.thread.MigrationTask;
 import org.ipph.thread.MigrationUpdateTask;
 import org.ipph.thread.ThreadPool;
+import org.ipph.util.MapUtil;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
@@ -46,7 +50,12 @@ public class MigrateDao {
 	private int size=3000;
 	
 	private Logger log=Logger.getLogger(MigrateDao.class);
-
+	
+	public Set<String> allSet=new HashSet<>();
+	public Set<String> appnumberSet=new HashSet<>();
+	public Set<String> repeatSet=new HashSet<>();
+	public Set<String> unfindSet=new HashSet<>();
+	
 	/**
 	 * 迁移主表数据
 	 * @param table
@@ -108,8 +117,8 @@ public class MigrateDao {
 			threadPool.addTask(new MigrationTask(this, table, isSubTable,index, size,batch));
 			
 		}
-		/*threadPool.addTask(new MigrationTask(this, table, isSubTable,0, total,batch));
-		batchMigrateTable(table, batch, 0,total,isSubTable);*/
+		//threadPool.addTask(new MigrationTask(this, table, isSubTable,0, total,batch));
+		//batchMigrateTable(table, batch, 0,total,isSubTable);
 	}
 	/**
 	 * 更新目标数据集
@@ -131,7 +140,6 @@ public class MigrateDao {
 		long total=getTotal(table);
 		
 		//threadPool.addTask(new MigrationUpdateTask(this, table, 0, total,batch));
-		
 		for(int index=0;index<total;index+=size){
 			threadPool.addTask(new MigrationUpdateTask(this, table, index, size,batch));
 		}
@@ -143,7 +151,7 @@ public class MigrateDao {
 	 * @param batch
 	 * @param isSubTable
 	 */
-	public void migrateTable(TableModel table,long start,long size,boolean isSubTable){
+	public  void migrateTable(TableModel table,long start,long size,boolean isSubTable){
 		if(null==table|| table.isSkip()) return;
 		
 		String select=sqlBuilder.getSelectSql(table);
@@ -157,20 +165,18 @@ public class MigrateDao {
 		//判断唯一键是否重复
 		String isExistsSql=sqlBuilder.isUniqueFieldExistsSelectSql(table);
 		
-		String errorInsert=sqlBuilder.getErrorInsertSql(table);
-		
 		List<Map<String,Object>> result=sqlOperation.getMigrateData(select+" limit "+start+","+size,rowDataHandler.handleFieldCondition(table));
 		
 		List<Object[]> paramDataList=new ArrayList<>();
 		
 		if(null!=result){
+			
 			for(Map<String,Object> row:result){
 				try{
 					//判断唯一键或主键是否已经存在
 					if(sqlOperation.isExists(isExistsSql, rowDataHandler.handleUniqueRowData(row,table))){
-						continue;
+						throw new DataExistsException("记录已经存在!");
 					}
-					
 					if(log.isDebugEnabled()){
 						log.debug("执行插入语句："+insert);
 					}
@@ -190,9 +196,11 @@ public class MigrateDao {
 						}
 					}
 				}catch(FormatException e){
-					migrateExceptionHandler.formatExceptionHandler(e, row, table);
+					migrateExceptionHandler.formatExceptionHandler(e, row, table,isSubTable);
+				}catch (DataExistsException e) {
+					migrateExceptionHandler.dataExistsExceptionHandler(e, row, table);
 				}catch (Exception e) {
-					migrateExceptionHandler.sqlExceptionHandler(e, errorInsert, row, table);
+					migrateExceptionHandler.sqlExceptionHandler(e, row, table,isSubTable);
 				}
 			}
 		}
@@ -226,12 +234,12 @@ public class MigrateDao {
 			result=sqlOperation.getMigrateData(limitSql,rowDataHandler.handleFieldCondition(table));
 			
 			if(null!=result){
-				
 				for(Map<String,Object> row:result){
 					try{
 						//判断唯一键或主键是否已经存在
 						if(sqlOperation.isExists(isExistsSql, rowDataHandler.handleUniqueRowData(row,table))){
-							continue;
+							throw new DataExistsException("记录已经存在!");
+							//continue;
 						}
 						if(!isSubTable){
 							//处理批次数据
@@ -240,9 +248,11 @@ public class MigrateDao {
 							migrateSubTableRow(row, table, batchDataList);
 						}
 					}catch(FormatException e){
-						migrateExceptionHandler.formatExceptionHandler(e,row, table);
+						migrateExceptionHandler.formatExceptionHandler(e,row, table,false);
 					}catch (SeparatorException e) {
 						migrateExceptionHandler.separatorExceptionHandler(e, row, table);
+					} catch (DataExistsException e) {
+						migrateExceptionHandler.dataExistsExceptionHandler(e, row, table);
 					}
 				}
 				try{
@@ -297,13 +307,15 @@ public class MigrateDao {
 						if(log.isDebugEnabled()){
 							log.debug("update the data success!");
 						}
+					}else{
+						log.error("更新失败"+MapUtil.outMapData(row));
 					}
 				}catch(FormatException e){
-					//migrateExceptionHandler.formatExceptionHandler(e, null, row, table);
+					migrateExceptionHandler.formatExceptionHandler(e, row, table,true);
 				}catch(DataNotFoundException e){
-					migrateExceptionHandler.dataNotFoundExceptionHandler(e,null, row, table);
+					migrateExceptionHandler.dataNotFoundExceptionHandler(e,row, table);
 				}catch(Exception e){
-					migrateExceptionHandler.sqlExceptionHandler(e, null, row, table);
+					migrateExceptionHandler.sqlExceptionHandler(e, row, table,true);
 				}
 				
 			}
@@ -341,21 +353,34 @@ public class MigrateDao {
 		
 			if(result!=null){
 				for(Map<String,Object> row:result){
+					
+					allSet.add((String)row.get("patentNo"));
 					try{
 						if(null!=toUpdSelect){
 							if(!sqlOperation.isExists(toUpdSelect, rowDataHandler.handle2UpdRowData(row,table))){
+								unfindSet.add((String)row.get("patentNo"));
 								throw new DataNotFoundException("未找到更新记录");
 							}
 						}
 						batchDataList.add(rowDataHandler.handle2MigrateRowData(row,table));
 					}catch(FormatException e){
-						//migrateExceptionHandler.formatExceptionHandler(e, null, row, table);
+						migrateExceptionHandler.formatExceptionHandler(e, row, table,true);
 					}catch(DataNotFoundException e){
-						migrateExceptionHandler.dataNotFoundExceptionHandler(e,null, row, table);
+						//migrateExceptionHandler.dataNotFoundExceptionHandler(e,row, table);
 					}
 				}
 				try{
 					if(batchDataList.size()>0){
+						synchronized (this) {
+							for(Object[] tmp:batchDataList){
+								String s=(String)tmp[1];
+								if(appnumberSet.contains(s)){
+									repeatSet.add(s);
+								}
+								appnumberSet.add(s);
+							}
+							
+						}
 						sqlOperation.migrate(update, batchDataList);
 					}
 				}catch (Exception e) {

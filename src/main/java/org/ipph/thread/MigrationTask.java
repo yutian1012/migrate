@@ -4,6 +4,8 @@ import org.ipph.migration.dao.MigrateDao;
 import org.ipph.model.TableModel;
 
 public class MigrationTask implements Runnable{
+	
+	//private Logger log=Logger.getLogger(MigrationTask.class);
 
 	private MigrateDao migrateDao;
 	
