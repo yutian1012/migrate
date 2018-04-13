@@ -18,7 +18,7 @@
     
     <bean id="fromDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
     	<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
-    	<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/ipo"></property>
+    	<property name="jdbcUrl" value="jdbc:mysql://172.17.30.165:3306/fs_hncs_ipo"></property>
     	<property name="user" value="root"></property>
     	<property name="password" value="root"></property>
     </bean>
@@ -30,7 +30,8 @@
     
     <bean id="toDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
     	<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
-    	<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/migration"></property>
+    	<property name="jdbcUrl" value="jdbc:mysql://172.17.30.165:3306/fs_hncs_20180412"></property>
+    	<!-- <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/hncs"></property> -->
     	<property name="user" value="root"></property>
     	<property name="password" value="root"></property>
     </bean>
@@ -54,6 +55,7 @@
     			<ref bean="jsonMethodFormater"/>
     			<ref bean="patentNoFormater"/>
     			<ref bean="pctNoFormater"/>
+    			<ref bean="userDataFormater"/>
     		</list>
     	</property>
     </bean>
@@ -62,12 +64,14 @@
     <bean id="jsonMethodFormater" class="org.ipph.format.JsonMethodFormater"></bean>
     <bean id="patentNoFormater" class="org.ipph.format.PatentNoFormater"></bean>
     <bean id="pctNoFormater" class="org.ipph.format.PctNoFormater"></bean>
+    <bean id="userDataFormater" class="org.ipph.format.UserDataFormater"></bean>
     
     <!-- 条件处理 -->
     <bean id="conditionContext" class="org.ipph.condition.ConditionContext">
     	<property name="conditionList">
     		<list>
     			<ref bean="conditionInImpl"/>
+    			<ref bean="conditionNotInImpl"/>
     			<ref bean="conditionIsNullImpl"/>
     			<ref bean="conditionIsNotNullImpl"/>
     			<ref bean="conditionDefaultImpl"/>
@@ -76,6 +80,7 @@
     </bean>
     
     <bean id="conditionInImpl" class="org.ipph.condition.ConditionInImpl"></bean>
+    <bean id="conditionNotInImpl" class="org.ipph.condition.ConditionNotInImpl"></bean>
     <bean id="conditionIsNotNullImpl" class="org.ipph.condition.ConditionIsNotNullImpl"></bean>
     <bean id="conditionIsNullImpl" class="org.ipph.condition.ConditionIsNullImpl"></bean>
     <bean id="conditionDefaultImpl" class="org.ipph.condition.ConditionDefaultImpl"></bean>

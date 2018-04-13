@@ -86,6 +86,8 @@
 				<xsd:element ref="condition" maxOccurs="1"></xsd:element>
 				<!-- 字段差分 -->
 				<xsd:element ref="fieldSeparator"></xsd:element>
+				<!-- 主键自增 -->
+				<xsd:element name="gencode"></xsd:element>
 				<!-- 外键策略 -->
 				<!-- <xsd:element name="foreignKey"></xsd:element> -->
 			</xsd:sequence>
@@ -129,6 +131,7 @@
 						<xsd:enumeration value="LLIKE"></xsd:enumeration>
 						<xsd:enumeration value="RLIKE"></xsd:enumeration>
 						<xsd:enumeration value="IN"></xsd:enumeration>
+						<xsd:enumeration value="NOTIN"></xsd:enumeration>
 						<xsd:enumeration value="EQUAL"></xsd:enumeration>
 						<xsd:enumeration value="NEQUAL"></xsd:enumeration>
 					</xsd:restriction>

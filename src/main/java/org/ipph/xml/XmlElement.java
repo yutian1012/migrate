@@ -15,11 +15,13 @@ public interface XmlElement {
 	//format_class标签下的format_class_name标签
 	public static final String format_class_name="format_class_name";
 	//format_class_method标签下的format_class_arg标签
-	public static final String format_class_arg="format_class_method_arg";
+	public static final String format_class_arg="format_class_arg";
 	//字段条件字段
 	public static final String field_condition="condition";
 	
 	public static final String fieldSeparator="fieldSeparator";
 	public static final String separator_class_name="separator_class_name";
 	public static final String separator_class_arg="separator_class_arg";
+	
+	public static final String gencode="gencode";
 }

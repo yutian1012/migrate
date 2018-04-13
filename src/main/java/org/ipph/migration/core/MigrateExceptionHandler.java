@@ -125,7 +125,7 @@ public class MigrateExceptionHandler {
 		if(isUpdate){
 			return;
 		}
-		if(row.containsKey("id")&&null!=row.get("id")){
+		/*if(row.containsKey("id")&&null!=row.get("id")){
 			if(put(table.getFrom(),(Long) row.get("id"))){
 				String sql=sqlBuilder.getErrorInsertSql(table);
 				try {
@@ -136,7 +136,7 @@ public class MigrateExceptionHandler {
 					e1.printStackTrace();
 				}
 			}
-		}
+		}*/
 	}
 	
 	private synchronized boolean put(String tableName,Long value){

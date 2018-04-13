@@ -2,10 +2,8 @@ package org.ipph.migration.dao;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -50,12 +48,6 @@ public class MigrateDao {
 	private int size=3000;
 	
 	private Logger log=Logger.getLogger(MigrateDao.class);
-	
-	public Set<String> allSet=new HashSet<>();
-	public Set<String> appnumberSet=new HashSet<>();
-	public Set<String> repeatSet=new HashSet<>();
-	public Set<String> unfindSet=new HashSet<>();
-	
 	/**
 	 * 迁移主表数据
 	 * @param table
@@ -353,12 +345,9 @@ public class MigrateDao {
 		
 			if(result!=null){
 				for(Map<String,Object> row:result){
-					
-					allSet.add((String)row.get("patentNo"));
 					try{
 						if(null!=toUpdSelect){
 							if(!sqlOperation.isExists(toUpdSelect, rowDataHandler.handle2UpdRowData(row,table))){
-								unfindSet.add((String)row.get("patentNo"));
 								throw new DataNotFoundException("未找到更新记录");
 							}
 						}
@@ -366,21 +355,11 @@ public class MigrateDao {
 					}catch(FormatException e){
 						migrateExceptionHandler.formatExceptionHandler(e, row, table,true);
 					}catch(DataNotFoundException e){
-						//migrateExceptionHandler.dataNotFoundExceptionHandler(e,row, table);
+						migrateExceptionHandler.dataNotFoundExceptionHandler(e,row, table);
 					}
 				}
 				try{
 					if(batchDataList.size()>0){
-						synchronized (this) {
-							for(Object[] tmp:batchDataList){
-								String s=(String)tmp[1];
-								if(appnumberSet.contains(s)){
-									repeatSet.add(s);
-								}
-								appnumberSet.add(s);
-							}
-							
-						}
 						sqlOperation.migrate(update, batchDataList);
 					}
 				}catch (Exception e) {

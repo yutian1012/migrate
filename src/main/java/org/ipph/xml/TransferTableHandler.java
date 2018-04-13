@@ -139,6 +139,11 @@ public class TransferTableHandler extends DefaultHandler {
     			fieldModel.setFormat(fieldFormatModel.copyFieldFormatModel());//克隆对象
     		}
     		fieldFormatModel=null;
+    	}else if(XmlElement.gencode.equals(qName)){
+    		if(null!=fieldModel){
+    			fieldModel.setGencode(true);
+    		}
+    		fieldFormatModel=null;
     	}else if(XmlElement.separator_class_name.equals(qName)) {
     		if(null!=fieldSeparatorModel){
     			fieldSeparatorModel.setClassName(s);

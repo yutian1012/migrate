@@ -1,5 +1,6 @@
 package org.ipph.condition;
 
+import org.ipph.exception.ConditionException;
 import org.ipph.model.FieldConditionModel;
 
 public interface Condition {

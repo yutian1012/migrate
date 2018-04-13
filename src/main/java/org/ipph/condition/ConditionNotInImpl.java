@@ -2,7 +2,7 @@ package org.ipph.condition;
 
 import org.ipph.model.FieldConditionModel;
 
-public class ConditionInImpl implements Condition{
+public class ConditionNotInImpl implements Condition{
 
 	@Override
 	public String getConditionParam(FieldConditionModel fieldConditionModel){

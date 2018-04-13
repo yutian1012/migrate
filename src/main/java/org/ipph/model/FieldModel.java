@@ -11,6 +11,7 @@ public class FieldModel implements Cloneable{
 	private FieldFormatModel format;
 	private FieldConditionModel condition;
 	private FieldSeparatorModel fieldSeparatorModel;
+	private boolean gencode;
 	
 	public String getFrom() {
 		return from;
@@ -60,6 +61,12 @@ public class FieldModel implements Cloneable{
 	}
 	public void setFieldSeparatorModel(FieldSeparatorModel fieldSeparatorModel) {
 		this.fieldSeparatorModel = fieldSeparatorModel;
+	}
+	public boolean isGencode() {
+		return gencode;
+	}
+	public void setGencode(boolean gencode) {
+		this.gencode = gencode;
 	}
 	public FieldModel copyFieldModel(){
 		try {

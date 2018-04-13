@@ -12,6 +12,7 @@ import org.ipph.format.FormaterContext;
 import org.ipph.model.FieldModel;
 import org.ipph.model.FieldRestrictEnum;
 import org.ipph.model.TableModel;
+import org.ipph.util.IdGenerator;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -162,6 +163,9 @@ public class RowDataHandler {
 		if(null==value||"".equals(value)){
 			if(null!=field.getDefaultValue()&&!"".equals(field.getDefaultValue())){
 				value=field.getDefaultValue().trim();
+			}
+			if(field.isGencode()){
+				value= IdGenerator.nextId();
 			}
 		}
 		return value;

@@ -3,6 +3,7 @@ package org.ipph.migration.sql;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ipph.exception.ConditionException;
 import org.ipph.model.FieldModel;
 import org.ipph.model.FieldRestrictEnum;
 import org.ipph.model.TableModel;
@@ -15,6 +16,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 	 * 获取查询语句
 	 * @param tableModel
 	 * @return
+	 * @throws ConditionException 
 	 */
 	public String getSelectSql(TableModel tableModel){
 

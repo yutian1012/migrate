@@ -2,6 +2,7 @@ package org.ipph.condition;
 
 import java.util.List;
 
+import org.ipph.exception.ConditionException;
 import org.ipph.model.FieldConditionTypeEnum;
 import org.ipph.model.FieldModel;
 
@@ -41,6 +42,7 @@ public class ConditionContext {
 	 * 针对in的情况还需要解析设置的参数，从而确定出参数的个数，可能会有多个逗号作为占位符
 	 * @param field
 	 * @return
+	 * @throws ConditionException 
 	 */
 	public String getConditionParam(FieldModel field){
 		return (String) getConditionParamInfo(field,true);
@@ -49,6 +51,7 @@ public class ConditionContext {
 	 * 获取条件的数据，替换sql中的占位符
 	 * @param field
 	 * @return
+	 * @throws ConditionException 
 	 */
 	public Object getConditionParamValue(FieldModel field){
 		return getConditionParamInfo(field, false);
@@ -58,6 +61,7 @@ public class ConditionContext {
 	 * @param field
 	 * @param isParam true表示参数值，false表示参数占位符
 	 * @return
+	 * @throws ConditionException 
 	 */
 	private Object getConditionParamInfo(FieldModel field,boolean isParam){
 		
@@ -91,6 +95,9 @@ public class ConditionContext {
 		switch (conditionType) {
 		case IN:
 			condition=getCondition(ConditionInImpl.class);
+			break;
+		case NOTIN:
+			condition=getCondition(ConditionNotInImpl.class);
 			break;
 		case ISNOTNULL:
 			condition=getCondition(ConditionIsNotNullImpl.class);

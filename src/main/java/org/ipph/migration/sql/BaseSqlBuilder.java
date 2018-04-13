@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.ipph.condition.ConditionContext;
+import org.ipph.exception.ConditionException;
 import org.ipph.model.FieldModel;
 
 public class BaseSqlBuilder {
@@ -89,6 +90,7 @@ public class BaseSqlBuilder {
 	 * 使用Condition字段获取条件
 	 * @param conditionList
 	 * @return
+	 * @throws ConditionException 
 	 */
 	protected String getWhereByConditionField(List<FieldModel> conditionList){
 		StringBuilder sbuilder=new StringBuilder();
