@@ -49,7 +49,7 @@
     	</fields>
     </table>
     <!-- 专利申请数据的更新 -->
-    <table type="UPDATE" to="z_patent" from="tpatentallo">
+    <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
     	<fields>
     		<!-- to有值，from无值作为待更新的字段 ,待更新字段必须在上方-->
     		<field to="isApply" from="" field_default="1"></field>
@@ -72,7 +72,7 @@
     	</fields>
     </table>
     <!-- 专利授权数据的更新 -->
-    <table type="UPDATE" to="z_patent" from="tpatentallo" >
+    <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
     	<fields>
     		<!-- to有值，from无值作为待更新的字段 ,待更新字段必须在上方-->
     		<field to="isCity" from="" field_default="1"></field>
@@ -95,7 +95,7 @@
     	</fields>
     </table>
     <!-- pct申请数据 -->
-    <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo">
+    <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo" skip="true">
     	<fields>
 			<field to="id" from="id"></field>    	
     		<field to="patentName" from="patentName"></field>
@@ -128,7 +128,7 @@
     	</fields>
     </table>
     <!-- pct授权数据 -->
-    <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo">
+    <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo" skip="true">
     	<fields>
 			<field to="id" from="id"></field>
     		<field to="patentName" from="patentName"></field>
@@ -330,11 +330,11 @@
     		<field to="id" from="id"></field>
     		<field to="batchNo" from="workno"></field>
     		<field to="copyrightName" from="workname"></field>
-    		<field to="copyrightType" from="workType">
-    			<condition type="NOTIN">SY,SZDY</condition>
+    		<field to="copyrightType" from="workType" field_default="其他">
+    			<condition type="NOTIN">LYZP,LXZP,SY,SZDY,DY</condition>
     			<format>
     				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
-    				<format_class_arg>{'WZ':'文字','KS':'口述','YY':'音乐','XJ':'戏剧','QY':'曲艺','WD':'舞蹈','ZJ':'杂技艺术','MS':'美术','JZ':'建筑','SJT':'图形','MX':'模型','QT':'其他'}</format_class_arg>
+    				<format_class_arg>{'WZ':'文字','KS':'口述','YY':'音乐','XJ':'戏剧','QY':'曲艺','WD':'舞蹈','ZJ':'杂技艺术','MS':'美术','JZ':'建筑','SJT':'图形','MX':'模型','QT':'其他','RJ':'其他','DT':'图形'}</format_class_arg>
     			</format>
     		</field>
     		
@@ -342,7 +342,6 @@
     		<field to="ownerName" from="copyrightman"></field>
     		<field to="awardDate" from="releasedate"></field>
     		<field to="registFee" from="regcost"></field>
-    		
     		<field to="applicantName" from="name"></field>
     		<field to="applicantAddress" from="address"></field>
     		<field to="applicantPostcode" from="zip"></field>
@@ -355,6 +354,13 @@
     		<field to="result" from="" field_default="1"></field>
     		<field to="status" from="" field_default="1"></field>
     		<field to="odata" from="" field_default="1"></field>
+    		<field to="createDate" from="createTime"></field>
+    		<field to="county" from="area" field_default="芙蓉区">
+    			<format>
+    				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
+    				<format_class_arg>{'YLQ':'岳麓区','GXQ':'高新区','HRQ':'芙蓉区','YHQ':'雨花区','JKQ':'经开区','KFQ':'开福区','TXQ':'天心区','CSX':'长沙县','LXX':'宁乡县','LYX':'浏阳市','WCQ':'望城区'}</format_class_arg>
+    			</format>
+    		</field>
     	  <subTable name="cs_copyright_owner">
     		<fields>
     			<field to="id" from="">
@@ -382,16 +388,16 @@
     	</fields>
     </table>
     
-    <table type="MIGRATE" from="tcopyrightallo" to="cs_rights_copyright">
+    <table type="MIGRATE" from="tcopyrightallo" to="cs_rights_copyright" skip="true">
     	<fields>
     		<field to="rid" from="id"></field>
     		<field to="registNo" from="workno"></field>
     		<field to="copyrightName" from="workname"></field>
-    		<field to="copyrightType" from="workType">
-    			<condition type="IN">SY,SZDY</condition>
+    		<field to="copyrightType" from="workType" field_default="录像制品">
+    			<condition type="IN">LYZP,LXZP,SY,SZDY,DY</condition>
     			<format>
     				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
-    				<format_class_arg>{'SY':'录像制品','SZDY':'录像制品'}</format_class_arg>
+    				<format_class_arg>{'LXZP':'录像制品','LYZP':'录音制品','SY':'录像制品','SZDY':'录像制品','DY':'录像制品'}</format_class_arg>
     			</format>
     		</field>
     		
@@ -410,6 +416,13 @@
     		<field to="result" from="" field_default="1"></field>
     		<field to="status" from="" field_default="1"></field>
     		<field to="odata" from="" field_default="1"></field>
+    		<field to="createDate" from="createTime"></field>
+    		<field to="county" from="area">
+    			<format>
+    				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
+    				<format_class_arg>{'YLQ':'岳麓区','GXQ':'高新区','HRQ':'芙蓉区','YHQ':'雨花区','JKQ':'经开区','KFQ':'开福区','TXQ':'天心区','CSX':'长沙县','LXX':'宁乡县','LYX':'浏阳市','WCQ':'望城区'}</format_class_arg>
+    			</format>
+    		</field>
     	</fields>
     	<subTable name="cs_rights_copyright_owner">
     		<fields>
@@ -435,4 +448,54 @@
     		</fields>
     	</subTable>
     </table>
+    
+    
+    <!-- 暂不支持更新原始字段到目标字段上，只支持为目标字段设置默认值 -->
+    <!-- <table type="UPDATE" from="tcopyrightallo" to="cs_rights_copyright" >
+    	<fields>
+    		<field to="rid" from="id"></field>
+    		<field to="copyrightType" from="workType" field_default="录像制品">
+    			<condition type="IN">LYZP,LXZP,SY,SZDY,DY</condition>
+    			<format>
+    				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
+    				<format_class_arg>{'LXZP':'录像制品','LYZP':'录音制品','SY':'录像制品','SZDY':'录像制品','DY':'录像制品'}</format_class_arg>
+    			</format>
+    		</field>
+    		<field to="createDate" from="createTime"></field>
+    	</fields>
+    </table>
+    
+    <table type="UPDATE" from="tcopyrightallo" to="cs_copyright" >
+    	<fields>
+    		<field to="id" from="id"></field>
+    		<field to="copyrightType" from="workType" field_default="其他">
+    			<condition type="NOTIN">LYZP,LXZP,SY,SZDY,DY</condition>
+    			<format>
+    				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
+    				<format_class_arg>{'WZ':'文字','KS':'口述','YY':'音乐','XJ':'戏剧','QY':'曲艺','WD':'舞蹈','ZJ':'杂技艺术','MS':'美术','JZ':'建筑','SJT':'图形','MX':'模型','QT':'其他','RJ':'其他','DT':'图形'}</format_class_arg>
+    			</format>
+    		</field>
+    		<field to="createDate" from="createTime"></field>
+    	</fields>
+    </table> -->
+
+	<!-- 更新著作权类型字段 
+		  403 | QY   | 企业     | SQRLB | QY    | NULL       |
+		| 404 | KYYS | 科研院所 | SQRLB | KYYS  | NULL       |
+		| 405 | GR   | 个人     | SQRLB | GR    | NULL       |
+		| 406 | ZCGX | 驻长高校 | SQRLB | ZCGX  | NULL       |
+		| 407 | SHTT | 社会团体 | SQRLB | SHTT  | NULL       |
+		| 408 | JG   | 机关     | SQRLB | JG    | NULL 
+	-->
+	<!-- <table type="UPDATE" to="tcopyrightallo" from="tcopyrightallo">
+		<fields>
+			<field to="sourceType" from="tmp">
+				<format>
+					<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
+    				<format_class_arg>{'QY':'企业','KYYS':'','GR':'个人','ZCGX':'','SHTT':'','JG':''}</format_class_arg>
+				</format>
+			</field>
+			<field to="" from=""></field>
+		</fields>
+	</table> -->
 </tables>
