@@ -1,5 +1,6 @@
 package org.ipph.migration.sql;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -7,6 +8,7 @@ import javax.annotation.Resource;
 import org.ipph.condition.ConditionContext;
 import org.ipph.exception.ConditionException;
 import org.ipph.model.FieldModel;
+import org.ipph.model.WhereModel;
 
 public class BaseSqlBuilder {
 	
@@ -83,6 +85,46 @@ public class BaseSqlBuilder {
 		return sbuilder.toString();
 	}
 	
+	/**
+	 * 获取查询的where条件
+	 * @param whereModel
+	 * @return
+	 */
+	protected String getFromCondition(WhereModel whereModel){
+		List<FieldModel> conditionList=new ArrayList<>();
+		if(null!=whereModel){
+			for(FieldModel field:whereModel.getFieldList()){
+				if(null==field.getFrom()||"".equals(field.getFrom())){
+					continue;
+				}
+				
+				if(null!=field.getCondition()
+						&&null!=field.getCondition().getValue()
+						&&!"".equals(field.getCondition().getValue())){
+					conditionList.add(field);
+				}
+			}
+		}
+		return getWhereByConditionField(conditionList);
+	}
+	/**
+	 * 获取目标表的where条件
+	 * @param whereModel
+	 * @return
+	 */
+	protected String getTargetCondition(WhereModel whereModel){
+		List<FieldModel> conditionList=new ArrayList<>();
+		if(null!=whereModel){
+			for(FieldModel field:whereModel.getFieldList()){
+				if(null==field.getTo()||"".equals(field.getTo())){
+					continue;
+				}
+				
+				conditionList.add(field);
+			}
+		}
+		return getWhereByConditionField(conditionList);
+	}
 	
 	
 	/**

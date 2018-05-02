@@ -13,6 +13,7 @@ import org.ipph.model.FieldSeparatorModel;
 import org.ipph.model.SubtableModel;
 import org.ipph.model.TableModel;
 import org.ipph.model.TableOperationEnum;
+import org.ipph.model.WhereModel;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -43,7 +44,7 @@ public class TransferTableHandler extends DefaultHandler {
     private FieldConditionModel fieldConditionModel=null;
     private SubtableModel subTableModel=null;
     private FieldSeparatorModel fieldSeparatorModel=null;
-
+    private WhereModel whereModel=null;
     private StringBuffer temp=new StringBuffer();
     
     @Override
@@ -57,6 +58,10 @@ public class TransferTableHandler extends DefaultHandler {
     	table=null;
     	fieldModel=null;
     	fieldFormatModel=null;
+    	fieldConditionModel=null;
+    	subTableModel=null;
+    	fieldSeparatorModel=null;
+    	whereModel=null;
     }
     
     /**
@@ -94,14 +99,17 @@ public class TransferTableHandler extends DefaultHandler {
         	if(null!=attributes.getValue("field_restrict")&&!"".equals(attributes.getValue("field_restrict"))){
         		fieldModel.setRestrict(FieldRestrictEnum.valueOf(attributes.getValue("field_restrict")));
         	}
+        }else if(XmlElement.where.equals(qName)){//where条件
+        	whereModel=new WhereModel();
+        	whereModel.setFieldList(new ArrayList<FieldModel>());
         }else if(XmlElement.format.equals(qName)){//格式化
         	fieldFormatModel=new FieldFormatModel();
         }else if(XmlElement.fieldSeparator.equals(qName)){//字段拆分
         	fieldSeparatorModel=new FieldSeparatorModel();
         }else if(XmlElement.field_condition.equals(qName)){//条件
         	fieldConditionModel=new FieldConditionModel();
-        	String type=attributes.getValue("type");
-        	FieldConditionTypeEnum[] arr=FieldConditionTypeEnum.values();
+        	/*String type=attributes.getValue("type");
+        	FieldConditionTypeEnum[] arr=FieldConditionTypeEnum.values();*/
         	fieldConditionModel.setConditionType(FieldConditionTypeEnum.valueOf(attributes.getValue("type")));
         }
     };
@@ -165,13 +173,25 @@ public class TransferTableHandler extends DefaultHandler {
     		fieldFormatModel=null;
     	}else if(XmlElement.field.equals(qName)){
     		if(null!=fieldModel&&null!=table){
-    			if(subTableModel!=null){
+    			if(whereModel!=null){
+    				whereModel.getFieldList().add(fieldModel.copyFieldModel());
+    			}
+    			else if(subTableModel!=null){
     				subTableModel.getFiledList().add(fieldModel.copyFieldModel());
     			}else{
     				table.getFiledList().add(fieldModel.copyFieldModel());
     			}
     		}
     		fieldModel=null;
+    	}else if(XmlElement.where.equals(qName)){
+    		if(null!=whereModel){
+    			if(null!=subTableModel){
+    				subTableModel.setWhereModel(whereModel.copyWhereModel());
+    			}else if(null!=table){
+    				table.setWhereModel(whereModel);
+    			}
+    		}
+    		whereModel=null;
     	}else if(XmlElement.subTable.equals(qName)){
     		if(null!=subTableModel&&null!=table){
     			table.getSubTableList().add(subTableModel.copySubtableModel());

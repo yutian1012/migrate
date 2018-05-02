@@ -24,4 +24,7 @@ public interface XmlElement {
 	public static final String separator_class_arg="separator_class_arg";
 	
 	public static final String gencode="gencode";
+	
+	//where条件设置
+	public static final String where="where";
 }

@@ -26,17 +26,12 @@ public class SqlBuilder extends BaseSqlBuilder{
 		
 		StringBuilder sbuilder=new StringBuilder();
 		List<String> fieldList=new ArrayList<>();
-		List<FieldModel> conditionList=new ArrayList<>();
 		
 		//select查询字段
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getFrom()||"".equals(field.getFrom())) continue;
 			
 			fieldList.add(field.getFrom());
-			
-			if(null!=field.getCondition()&&null!=field.getCondition().getValue()){
-				conditionList.add(field);
-			}
 		}
 		
 		String sql=getSelectSql(tableModel.getFrom(), fieldList);
@@ -45,7 +40,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 			sbuilder.append(sql);
 		}
 		
-		String condition=getWhereByConditionField(conditionList);
+		String condition=getFromCondition(tableModel.getWhereModel());
 		
 		if(null!=condition){
 			sbuilder.append(condition);
@@ -65,15 +60,15 @@ public class SqlBuilder extends BaseSqlBuilder{
 		}
 		
 		StringBuilder sbuilder=new StringBuilder();
-		List<FieldModel> conditionList=new ArrayList<>();
+		//List<FieldModel> conditionList=new ArrayList<>();
 		
 		
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getFrom()||"".equals(field.getFrom())) continue;
 			
-			if(null!=field.getCondition()&&null!=field.getCondition().getValue()){
+			/*if(null!=field.getCondition()&&null!=field.getCondition().getValue()){
 				conditionList.add(field);
-			}
+			}*/
 		}
 		String sql=getCountSql(tableModel.getFrom());
 		
@@ -81,7 +76,17 @@ public class SqlBuilder extends BaseSqlBuilder{
 			sbuilder.append(sql);
 		}
 		
-		String condition=getWhereByConditionField(conditionList);
+		String condition=null;
+		
+		/*if(null!=tableModel.getWhereModel()){
+			for(FieldModel field:tableModel.getWhereModel().getFieldList()){
+				if("".equals(field.getTo())||null==field.getTo()){
+					conditionList.add(field);
+				}
+			}
+			condition=getWhereByConditionField(conditionList);
+		}*/
+		condition=getFromCondition(tableModel.getWhereModel());
 		
 		if(null!=condition){
 			sbuilder.append(condition);
@@ -153,20 +158,15 @@ public class SqlBuilder extends BaseSqlBuilder{
 		
 		StringBuilder sbuilder=new StringBuilder();
 		List<String> fieldList=new ArrayList<>();
-		List<String> conditionList=new ArrayList<>();
 		
 		for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getTo()||"".equals(field.getTo())){
 				continue;
 			}
-			if(null==field.getFrom()||"".equals(field.getFrom())){
-				//to有值，from无值作为待更新的字段
-				fieldList.add(field.getTo());
-			}else{
-				//两个都有值作为更新条件字段
-				conditionList.add(field.getTo());
-			}
+			fieldList.add(field.getTo());
 		}
+		
+		if(fieldList.size()==0) return null;
 		
 		String sql=getUpdateSql(tableModel.getTo(), fieldList);
 		
@@ -174,7 +174,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 			sbuilder.append(sql);
 		}
 		
-		String condition=getWhereByField(conditionList);
+		String condition=getTargetCondition(tableModel.getWhereModel());
 		
 		if(null!=condition){
 			sbuilder.append(condition);
@@ -230,9 +230,9 @@ public class SqlBuilder extends BaseSqlBuilder{
 		}
 		
 		StringBuilder sbuilder=new StringBuilder();
-		List<String> fieldList=new ArrayList<>();
+		//List<String> fieldList=new ArrayList<>();
 		
-		for(FieldModel field:tableModel.getFiledList()){
+		/*for(FieldModel field:tableModel.getFiledList()){
 			if(null==field.getTo()||"".equals(field.getTo())){
 				continue;
 			}
@@ -241,7 +241,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 			}
 			//from和to两个都有值作为关联条件
 			fieldList.add(field.getTo());
-		}
+		}*/
 		
 		String sql=getCountSql(tableModel.getTo());
 		
@@ -249,7 +249,7 @@ public class SqlBuilder extends BaseSqlBuilder{
 			sbuilder.append(sql);
 		}
 		
-		String condition=getWhereByField(fieldList);
+		String condition=getTargetCondition(tableModel.getWhereModel());
 		
 		if(null!=condition){
 			sbuilder.append(condition);

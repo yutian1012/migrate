@@ -53,7 +53,6 @@ public class MigrateDao {
 	 * @param table
 	 */
 	public void migrateMasterTable(TableModel table) {
-		//migrateTable(table, false);
 		batchMigrateTable(table, 1,false);
 	}
 	/**
@@ -102,15 +101,10 @@ public class MigrateDao {
 		if(null==table|| table.isSkip()) return;
 		
 		long total=getTotal(table);
-		/*if(!isSubTable){
-			total=5;
-		}*/
 		for(int index=0;index<total;index+=size){
 			threadPool.addTask(new MigrationTask(this, table, isSubTable,index, size,batch));
 			
 		}
-		//threadPool.addTask(new MigrationTask(this, table, isSubTable,0, total,batch));
-		//batchMigrateTable(table, batch, 0,total,isSubTable);
 	}
 	/**
 	 * 更新目标数据集
@@ -131,10 +125,10 @@ public class MigrateDao {
 		
 		long total=getTotal(table);
 		
-		//threadPool.addTask(new MigrationUpdateTask(this, table, 0, total,batch));
 		for(int index=0;index<total;index+=size){
-			threadPool.addTask(new MigrationUpdateTask(this, table, index, size,batch));
+			//threadPool.addTask(new MigrationUpdateTask(this, table, index, size,batch));
 		}
+		updateTable(table,0, total);
 	}
 	/**
 	 * 逐条迁移操作
@@ -289,7 +283,8 @@ public class MigrateDao {
 			for(Map<String,Object> row:result){
 				try{
 					if(null!=toUpdSelect){
-						if(!sqlOperation.isExists(toUpdSelect, rowDataHandler.handle2UpdRowData(row,table))){
+						//if(!sqlOperation.isExists(toUpdSelect, rowDataHandler.handle2UpdRowData(row,table))){
+						if(!sqlOperation.isExists(toUpdSelect, rowDataHandler.handleWhereRowData(row,table))){
 							throw new DataNotFoundException("未找到更新记录");
 						}
 					}

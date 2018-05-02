@@ -69,6 +69,36 @@ public class RowDataHandler {
 		return null;
 	}
 	/**
+	 * 设置查询条件的字段处理
+	 * @param row
+	 * @param table
+	 * @return
+	 * @throws FormatException
+	 */
+	public Object[] handleWhereRowData(Map<String,Object> row,TableModel table)throws FormatException{
+		List<FieldModel> fieldList=new ArrayList<>();
+		
+		if(null!=table.getWhereModel()){
+			
+			for(FieldModel field:table.getWhereModel().getFieldList()){
+				if(null==field.getTo()||"".equals(field.getTo())){
+					continue;
+				}
+				if(null==field.getFrom()||"".equals(field.getFrom())){
+					continue;
+				}
+				
+				fieldList.add(field);
+			}
+			
+		}
+		
+		if(fieldList.size()>0){
+			return handleRowData(fieldList, row);
+		}
+		return null;
+	}
+	/**
 	 * 获取待更新字段的参数值
 	 * @param row
 	 * @param table
@@ -76,6 +106,52 @@ public class RowDataHandler {
 	 * @throws FormatException
 	 */
 	public Object[] handle2MigrateRowData(Map<String,Object> row,TableModel table)throws FormatException{
+		/*List<FieldModel> fieldList=new ArrayList<>();
+		
+		for(FieldModel field:table.getFiledList()){
+			if(null==field.getTo()||"".equals(field.getTo())){
+				continue;
+			}
+			fieldList.add(field);
+		}
+		
+		
+		if(fieldList.size()>0){
+			return handleRowData(fieldList, row);
+		}
+		return null;*/
+		
+		Object[] field=handleFieldRowData(row,table);
+	
+		int fieldLen = field!=null?field.length:0;
+		
+		Object[] where=handleWhereRowData(row, table);
+		
+		int whereLen=where!=null?where.length:0;
+		
+		if(fieldLen+whereLen>0){
+			Object[] result=new Object[fieldLen+whereLen];
+			
+			if(fieldLen>0){
+				System.arraycopy(field, 0, result, 0, fieldLen);
+			}
+			
+			if(whereLen>0){
+				System.arraycopy(where, 0, result, fieldLen, whereLen);
+			}
+			return result;
+		}
+		
+		return null;
+	}
+	/**
+	 * 处理字段参数值
+	 * @param row
+	 * @param table
+	 * @return
+	 * @throws FormatException
+	 */
+	public Object[] handleFieldRowData(Map<String,Object> row,TableModel table) throws FormatException{
 		List<FieldModel> fieldList=new ArrayList<>();
 		
 		for(FieldModel field:table.getFiledList()){
@@ -84,6 +160,7 @@ public class RowDataHandler {
 			}
 			fieldList.add(field);
 		}
+		
 		
 		if(fieldList.size()>0){
 			return handleRowData(fieldList, row);
@@ -123,27 +200,27 @@ public class RowDataHandler {
 	public Object[] handleFieldCondition(TableModel table){
 		List<Object> result=new ArrayList<>();
 		
-		for(FieldModel field:table.getFiledList()){
-			if(null==field.getFrom()||"".equals(field.getFrom())) continue;
+		if(null!=table.getWhereModel()){
 			
-			if(null!=field.getCondition()&&null!=field.getCondition().getValue()){
+			for(FieldModel field:table.getWhereModel().getFieldList()){
+				if(null==field.getFrom()||"".equals(field.getFrom())) continue;
 				
-				if(conditionContext.isValueSkip(field)){
-					continue;
-				}
-				
-				Object obj=conditionContext.getConditionParamValue(field);
-				if(null!=obj){
-					if(obj instanceof Object[]){
-						for(Object o:(Object[])obj){
-							result.add(o);
+				if(null!=field.getCondition()&&null!=field.getCondition().getValue()&&!"".equals(field.getCondition().getValue())){
+					if(conditionContext.isValueSkip(field)){
+						continue;
+					}
+					Object obj=conditionContext.getConditionParamValue(field);
+					if(null!=obj){
+						if(obj instanceof Object[]){
+							for(Object o:(Object[])obj){
+								result.add(o);
+							}
 						}
 					}
+					result.add(obj);
 				}
-				result.add(obj);
 			}
 		}
-		
 		return result.toArray();
 	}
 	

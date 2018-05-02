@@ -9,6 +9,7 @@ public class TableModel implements Cloneable{
 	private TableOperationEnum type;
 	private List<FieldModel> filedList;
 	private List<SubtableModel> subTableList;
+	private WhereModel whereModel;
 	private String from;
 	private String to;
 	private boolean skip;
@@ -47,6 +48,12 @@ public class TableModel implements Cloneable{
 	}
 	public void setSubTableList(List<SubtableModel> subTableList) {
 		this.subTableList = subTableList;
+	}
+	public WhereModel getWhereModel() {
+		return whereModel;
+	}
+	public void setWhereModel(WhereModel whereModel) {
+		this.whereModel = whereModel;
 	}
 	public TableModel copyTableModel(){
 		try {

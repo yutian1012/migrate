@@ -20,6 +20,14 @@
 					</xsd:complexType>
 				</xsd:element>
 				<xsd:element ref="subTable"></xsd:element>
+				<xsd:element name="where">
+					<xsd:complexType>
+						<xsd:sequence>
+							<!-- field标签可以出现多次，至少出现1次 -->
+							<xsd:element ref="field" minOccurs="1"></xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
 			</xsd:sequence>
 			<xsd:attribute name="skip">
 				<xsd:simpleType>

@@ -2,7 +2,7 @@
 <tables xmlns="http://www.migrate.org/schema/tables"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
    xsi:schemaLocation="http://www.migrate.org/schema/tables tables.xsd">
     <!-- 系统用户数据 -->
-    <table type="MIGRATE" to="sys_user" from="twxuser" skip="true">
+    <!-- <table type="MIGRATE" to="sys_user" from="twxuser" skip="true">
     	<fields>
 			<field to="userid" from="id"></field>    	
     		<field to="account" from="loginname"></field>
@@ -10,7 +10,7 @@
     			<condition type="ISNOTNULL"></condition>
     		</field>
     		<field to="password" from="" field_default="a4ayc/80/OGda4BO/1o/V0etpOqiLx1JwB5S3beHW0s="></field>
-    		<!-- 针对无法格式化的数据提供默认值 -->
+    		针对无法格式化的数据提供默认值
     		<field to="usertype" from="userType" field_default="1">
     			<format>
     				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
@@ -33,9 +33,9 @@
     		<field to="istalent" from="" field_default="0"></field>
     		<field to="submitTime" from="createtime"></field>
     	</fields>
-    </table>
+    </table> -->
     <!-- 系统管理员表 -->
-    <table type="MIGRATE" to="sys_user" from="tuser" skip="true">
+    <!-- <table type="MIGRATE" to="sys_user" from="tuser" skip="true">
     	<fields>
 			<field to="userid" from="id"></field>    	
     		<field to="account" from="loginname"></field>
@@ -43,59 +43,45 @@
     			<condition type="ISNOTNULL"></condition>
     		</field>
     		<field to="password" from="" field_default="a4ayc/80/OGda4BO/1o/V0etpOqiLx1JwB5S3beHW0s="></field>
-    		<!-- 针对无法格式化的数据提供默认值 -->
+    		针对无法格式化的数据提供默认值
     		<field to="usertype" from="" field_default="1"></field>
     		<field to="submitTime" from="createtime"></field>
     	</fields>
-    </table>
+    </table> -->
     <!-- 专利申请数据的更新 -->
-    <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
+    <!-- <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
     	<fields>
-    		<!-- to有值，from无值作为待更新的字段 ,待更新字段必须在上方-->
+    		to有值，from无值作为待更新的字段 ,待更新字段必须在上方
     		<field to="isApply" from="" field_default="1"></field>
-    		<!-- 两个都有值作为关联条件 -->
+    		两个都有值作为关联条件
     		<field to="appNumber" from="patentNo">
     			<format>
     				<format_class_name>org.ipph.format.PatentNoFormater</format_class_name>
     			</format>
     		</field>
-    		<!-- from有值，to无值作为源数据的查询条件 -->
-    		<!-- <field from="status" to="">
-    			<condition type="EQUAL">1</condition>
-    		</field> -->
     		<field to="" from="costtype">
     			<condition type="EQUAL">SQ1</condition>
     		</field>
-    		<!-- <field to="" from="transfermoney">
-    			<condition type="GT">0</condition>
-    		</field> -->
     	</fields>
-    </table>
+    </table> -->
     <!-- 专利授权数据的更新 -->
-    <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
+    <!-- <table type="UPDATE" to="z_patent" from="tpatentallo" skip="true">
     	<fields>
-    		<!-- to有值，from无值作为待更新的字段 ,待更新字段必须在上方-->
+    		to有值，from无值作为待更新的字段 ,待更新字段必须在上方
     		<field to="isCity" from="" field_default="1"></field>
-    		<!-- 两个都有值作为关联条件 -->
+    		两个都有值作为关联条件
     		<field to="appNumber" from="patentNo">
     			<format>
     				<format_class_name>org.ipph.format.PatentNoFormater</format_class_name>
     			</format>
     		</field>
-    		<!-- from有值，to无值作为源数据的查询条件 -->
-    		<!-- <field from="status" to="">
-    			<condition type="EQUAL">1</condition>
-    		</field> -->
     		<field to="" from="costtype">
     			<condition type="EQUAL">SQ2</condition>
     		</field>
-    		<!-- <field to="" from="transfermoney">
-    			<condition type="GT">0</condition>
-    		</field> -->
     	</fields>
-    </table>
+    </table> -->
     <!-- pct申请数据 -->
-    <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo" skip="true">
+    <!-- <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo" skip="true">
     	<fields>
 			<field to="id" from="id"></field>    	
     		<field to="patentName" from="patentName"></field>
@@ -116,26 +102,17 @@
     		<field to="money" from="transfermoney"></field>
     		<field to="statusType" from="" field_default="1"></field>
     		<field to="type" from="" field_default="0"></field>
-    		<!-- <field to="" from="status">
-    			<condition type="EQUAL">1</condition>
-    		</field> -->
     		<field to="" from="costType">
     			<condition type="EQUAL">SQ5</condition>
     		</field>
-    		<!-- <field to="" from="transfermoney">
-    			<condition type="GT">0</condition>
-    		</field> -->
     	</fields>
-    </table>
+    </table> -->
     <!-- pct授权数据 -->
-    <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo" skip="true">
+    <!-- <table type="MIGRATE" to="wf_patent_support_foreign" from="tpatentallo" skip="true">
     	<fields>
 			<field to="id" from="id"></field>
     		<field to="patentName" from="patentName"></field>
     		<field to="authNo" from="patentNo">
-    			<!-- <format>
-    				<format_class_name>org.ipph.format.PctAuthNoFormater</format_class_name>
-    			</format> -->
     		</field>
     		<field to="applyDate" from="requestDate"></field>
     		<field to="authDate" from="pctDate"></field>
@@ -149,183 +126,14 @@
     		<field to="money" from="transfermoney"></field>
     		<field to="statusType" from="" field_default="1"></field>
     		<field to="type" from="" field_default="1"></field>
-    		<!-- <field to="" from="status">
-    			<condition type="EQUAL">1</condition>
-    		</field> -->
     		<field to="" from="costType">
     			<condition type="EQUAL">SQ6</condition>
     		</field>
-    		<!-- <field to="" from="transfermoney">
-    			<condition type="GT">0</condition>
-    		</field> -->
     	</fields>
-    </table>
-    <!-- 软件著作权登记信息 -->
-    <!-- <table type="MIGRATE" from="tcopyrightreg" to="cs_copyright">
-    	<fields>
-    		作品信息
-    		<field to="id" from="id"></field>
-    		<field to="copyrightNo" from="receiptNo"></field>
-    		<field to="copyrightName" from="workname"></field>
-    		<field to="copyrightType" from="workType"></field>
-    		<field to="copyrightTypeMsg" from="notes"></field>
-    		作者姓名
-    		<field to="authorName" from="authorname"></field>
-    		<field to="workSignature" from="worksign"></field>
-    		作品基本信息
-    		<field to="workNature" from="property"></field>
-    		<field to="workNatureMsg" from="propertynote"></field>
-    		<field to="finishDate" from="overdate"></field>
-    		<field to="finishCountry" from="overcountry"></field>
-    		<field to="finishCity" from="overcity"></field>
-    		<field to="publicState" from="publishtype"></field>
-    		<field to="firstPublicDate" from="firstdate"></field>
-    		<field to="firstPublicCountry" from="firstcountry"></field>
-    		<field to="firstPublicCity" from="firstcity"></field>
-    		权利状况说明
-    		<field to="getRightWay" from="gainway"></field>
-    		<field to="RightOwnership" from="belongway"></field>
-    		<field to="RightOwnershipMsg" from="belongwaynote"></field>
-    		<field to="RightOwnershipStatus" from="allsect"></field>
-    		<field to="RightOwnershipParts" from="conditionsect"></field>
-    		<field to="RightOwnershipStatusMsg" from="conditionnote"></field>
-    		留样作品样本
-    		<field to="electronicSample" from="electronmedia"></field>
-    		<field to="electronicSampleNum" from="electronmedianum" field_default="0"></field>
-    		<field to="paperSample" from="papermedia"></field>
-    		<field to="paperSampleNum" from="papermedianum" field_default="0"></field>
-    		申请办理信息
-    		<field to="applyType" from="applyway">
-    			<condition type="EQUAL">0</condition>
-    		</field>
-    		<field to="applicantName" from="submitter"></field>
-    		<field to="applicantAddress" from="address"></field>
-    		<field to="applicantPostcode" from="zip"></field>
-    		<field to="applyContacts" from="linkman"></field>
-    		<field to="applicantTel" from="tel"></field>
-    		<field to="applicantEmail" from="email"></field>
-    		<field to="applyContactsPhone" from="mobile"></field>
-    		<field to="applicantFax" from="fax"></field>
-    		<field to="creatorId" from="creator" field_default="0">
-    			<format>
-    				<format_class_name>org.ipph.format.UserDataFormater</format_class_name>
-    			</format>
-    		</field>
-    		工作站
-    		<field to="" from="workstation"></field>
-    		
-    		<field to="" from="status">
-    			<condition type="EQUAL">1</condition>
-    		</field>
-    	</fields>
-    	字段拆分出来的子表-著作权人子表信息
-    	<subTable name="cs_copyright_owner">
-    		<fields>
-    			<field to="oid" from="id"></field>
-    			<field to="ownerName" from="name">
-    				<fieldSeparator>
-    					<separator_class_name></separator_class_name>
-    					分隔符定义为:逗号,分号,\,/,空格以及冒号
-    					<separator_class_arg>[,;\/ :]</separator_class_arg>
-    				</fieldSeparator>
-    				<condition type="ISNOTNULL"></condition>
-    			</field>
-    			<field to="ownerType" from="type"></field>
-    			<field to="ownerIDtype" from="cardType"></field>
-    			<field to="ownerIDNum" from="idcard"></field>
-    			<field to="ownerNationality" from="country"></field>
-    			<field to="ownerProvince" from="province"></field>
-    			<field to="ownercity" from="city"></field>
-    			<field to="signature" from="sign"></field>
-    			<field to="" from="status">
-	    			<condition type="EQUAL">1</condition>
-	    		</field>
-    		</fields>
-    	</subTable>
     </table> -->
     
-    <!-- 代理信息 -->
-   <!--  <table type="MIGRATE" from="tcopyrightreg" to="cs_copyright" skip="true">
-    	<fields>
-    		作品信息
-    		<field to="id" from="id"></field>
-    		<field to="copyrightNo" from="receiptNo"></field>
-    		<field to="copyrightName" from="workname"></field>
-    		<field to="copyrightType" from="workType"></field>
-    		<field to="copyrightTypeMsg" from="notes"></field>
-    		作者姓名
-    		<field to="authorName" from="authorname"></field>
-    		<field to="workSignature" from="worksign"></field>
-    		作品基本信息
-    		<field to="workNature" from="property"></field>
-    		<field to="workNatureMsg" from="propertynote"></field>
-    		<field to="finishDate" from="overdate"></field>
-    		<field to="finishCountry" from="overcountry"></field>
-    		<field to="finishCity" from="overcity"></field>
-    		<field to="publicState" from="publishtype"></field>
-    		<field to="firstPublicDate" from="firstdate"></field>
-    		<field to="firstPublicCountry" from="firstcountry"></field>
-    		<field to="firstPublicCity" from="firstcity"></field>
-    		权利状况说明
-    		<field to="getRightWay" from="gainway"></field>
-    		<field to="RightOwnership" from="belongway"></field>
-    		<field to="RightOwnershipMsg" from="belongwaynote"></field>
-    		<field to="RightOwnershipStatus" from="allsect"></field>
-    		<field to="RightOwnershipParts" from="conditionsect"></field>
-    		<field to="RightOwnershipStatusMsg" from="conditionnote"></field>
-    		留样作品样本
-    		<field to="electronicSample" from="electronmedia"></field>
-    		<field to="electronicSampleNum" from="electronmedianum"></field>
-    		<field to="paperSample" from="papermedia"></field>
-    		<field to="paperSampleNum" from="papermedianum"></field>
-    		申请办理信息
-    		<field to="applyType" from="applyway">
-    			<condition type="EQUAL">1</condition>
-    		</field>
-    		<field to="applicantName" from="proxyname"></field>
-    		<field to="applicantAddress" from="proxyaddress"></field>
-    		<field to="applicantPostcode" from="proxyzip"></field>
-    		<field to="applyContacts" from="proxylink"></field>
-    		<field to="applicantTel" from="proxytel"></field>
-    		<field to="applicantEmail" from="proxyemail"></field>
-    		<field to="applyContactsPhone" from="proxymobile"></field>
-    		<field to="applicantFax" from="proxyfax"></field>
-    		<field to="applicantEntrust" from="proxyitem"></field>
-    		
-    		工作站
-    		<field to="" from="workstation"></field>
-    		
-    		<field to="" from="status">
-    			<condition type="EQUAL">1</condition>
-    		</field>
-    	</fields>
-    	字段拆分出来的子表
-    	<subTable name="cs_copyright_owner">
-    		<fields>
-    			<field to="id" from="id">
-    				
-    			</field>
-    			<field to="ownerName" from="name">
-    				<fieldSeparator>
-    					<separator_class_name></separator_class_name>
-    					分隔符定义为:逗号,分号,\,/,空格以及冒号
-    					<separator_class_arg>[,;\/ :]</separator_class_arg>
-    				</fieldSeparator>
-    				<condition type="ISNOTNULL"/>
-    			</field>
-    			<field to="ownerType" from="type"></field>
-    			<field to="ownerIDtype" from="cardType"></field>
-    			<field to="ownerIDNum" from="idcard"></field>
-    			<field to="ownerNationality" from="country"></field>
-    			<field to="ownerProvince" from="province"></field>
-    			<field to="ownercity" from="city"></field>
-    			<field to="signature" from="sign"></field>
-    		</fields>
-    	</subTable>
-    </table> -->
-    <!-- 批次信息记录 -->
     <!-- 软件著作权补助 -->
-    <table type="MIGRATE" from="tcopyrightallo" to="cs_copyright">
+    <!-- <table type="MIGRATE" from="tcopyrightallo" to="cs_copyright">
     	<fields>
     		<field to="id" from="id"></field>
     		<field to="batchNo" from="workno"></field>
@@ -337,7 +145,12 @@
     				<format_class_arg>{'WZ':'文字','KS':'口述','YY':'音乐','XJ':'戏剧','QY':'曲艺','WD':'舞蹈','ZJ':'杂技艺术','MS':'美术','JZ':'建筑','SJT':'图形','MX':'模型','QT':'其他','RJ':'其他','DT':'图形'}</format_class_arg>
     			</format>
     		</field>
-    		
+    		<field to="userType" from="sourceType" field_default="其他">
+				<format>
+					<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
+    				<format_class_arg>{'QY':'企业','KYYS':'其他','GR':'个人','ZCGX':'高校','SHTT':'其他','JG':'其他'}</format_class_arg>
+				</format>
+			</field>
     		<field to="authorName" from="worker"></field>
     		<field to="ownerName" from="copyrightman"></field>
     		<field to="awardDate" from="releasedate"></field>
@@ -375,20 +188,13 @@
     				</fieldSeparator>
     				<condition type="ISNOTNULL"/>
     			</field>
-    			<!-- <field to="ownerType" from="type"></field>
-    			<field to="ownerIDtype" from="cardType"></field>
-    			<field to="ownerIDNum" from="idcard"></field>
-    			<field to="ownerNationality" from="country"></field>
-    			<field to="ownerProvince" from="province"></field>
-    			<field to="ownercity" from="city"></field>
-    			<field to="signature" from="sign"></field> -->
     		</fields>
     	</subTable>
     		
     	</fields>
-    </table>
+    </table> -->
     
-    <table type="MIGRATE" from="tcopyrightallo" to="cs_rights_copyright" skip="true">
+    <!-- <table type="MIGRATE" from="tcopyrightallo" to="cs_rights_copyright">
     	<fields>
     		<field to="rid" from="id"></field>
     		<field to="registNo" from="workno"></field>
@@ -400,7 +206,12 @@
     				<format_class_arg>{'LXZP':'录像制品','LYZP':'录音制品','SY':'录像制品','SZDY':'录像制品','DY':'录像制品'}</format_class_arg>
     			</format>
     		</field>
-    		
+    		<field to="userType" from="sourceType" field_default="其他">
+				<format>
+					<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
+    				<format_class_arg>{'QY':'企业','KYYS':'其他','GR':'个人','ZCGX':'高校','SHTT':'其他','JG':'其他'}</format_class_arg>
+				</format>
+			</field>
     		<field to="issueDate" from="releasedate"></field>
     		<field to="registFee" from="regcost"></field>
     		
@@ -438,46 +249,11 @@
     				</fieldSeparator>
     				<condition type="ISNOTNULL"/>
     			</field>
-    			<!-- <field to="ownerType" from="type"></field>
-    			<field to="ownerIDtype" from="cardType"></field>
-    			<field to="ownerIDNum" from="idcard"></field>
-    			<field to="ownerNationality" from="country"></field>
-    			<field to="ownerProvince" from="province"></field>
-    			<field to="ownercity" from="city"></field>
-    			<field to="signature" from="sign"></field> -->
     		</fields>
     	</subTable>
     </table>
+     -->
     
-    
-    <!-- 暂不支持更新原始字段到目标字段上，只支持为目标字段设置默认值 -->
-    <!-- <table type="UPDATE" from="tcopyrightallo" to="cs_rights_copyright" >
-    	<fields>
-    		<field to="rid" from="id"></field>
-    		<field to="copyrightType" from="workType" field_default="录像制品">
-    			<condition type="IN">LYZP,LXZP,SY,SZDY,DY</condition>
-    			<format>
-    				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
-    				<format_class_arg>{'LXZP':'录像制品','LYZP':'录音制品','SY':'录像制品','SZDY':'录像制品','DY':'录像制品'}</format_class_arg>
-    			</format>
-    		</field>
-    		<field to="createDate" from="createTime"></field>
-    	</fields>
-    </table>
-    
-    <table type="UPDATE" from="tcopyrightallo" to="cs_copyright" >
-    	<fields>
-    		<field to="id" from="id"></field>
-    		<field to="copyrightType" from="workType" field_default="其他">
-    			<condition type="NOTIN">LYZP,LXZP,SY,SZDY,DY</condition>
-    			<format>
-    				<format_class_name>org.ipph.format.JsonMethodFormater</format_class_name>
-    				<format_class_arg>{'WZ':'文字','KS':'口述','YY':'音乐','XJ':'戏剧','QY':'曲艺','WD':'舞蹈','ZJ':'杂技艺术','MS':'美术','JZ':'建筑','SJT':'图形','MX':'模型','QT':'其他','RJ':'其他','DT':'图形'}</format_class_arg>
-    			</format>
-    		</field>
-    		<field to="createDate" from="createTime"></field>
-    	</fields>
-    </table> -->
 
 	<!-- 更新著作权类型字段 
 		  403 | QY   | 企业     | SQRLB | QY    | NULL       |
@@ -486,8 +262,11 @@
 		| 406 | ZCGX | 驻长高校 | SQRLB | ZCGX  | NULL       |
 		| 407 | SHTT | 社会团体 | SQRLB | SHTT  | NULL       |
 		| 408 | JG   | 机关     | SQRLB | JG    | NULL 
+		//处理过程
+		select count(1) from tcopyrightreg a,twxuser b where b.loginname=a.creator;
+		
 	-->
-	<!-- <table type="UPDATE" to="tcopyrightallo" from="tcopyrightallo">
+	<table type="UPDATE" to="tcopyrightallo" from="tcopyrightreg">
 		<fields>
 			<field to="sourceType" from="tmp">
 				<format>
@@ -495,7 +274,20 @@
     				<format_class_arg>{'QY':'企业','KYYS':'','GR':'个人','ZCGX':'','SHTT':'','JG':''}</format_class_arg>
 				</format>
 			</field>
-			<field to="" from=""></field>
+			<field to="" from="workname"></field>
 		</fields>
-	</table> -->
+		<!-- 设置where条件 -->
+		<where>
+			<field to="workname" from="workname">
+				<condition type="EQUAL"/>
+			</field>
+			<field to="" from="id">
+				<condition type="EQUAL">16809</condition>
+			</field>
+		</where>
+		<!-- 设置约束 -->
+		<constraint>
+			
+		</constraint>
+	</table>
 </tables>
